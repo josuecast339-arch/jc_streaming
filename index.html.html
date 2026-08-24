@@ -40,11 +40,11 @@
             <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">JC Streaming</h1>
             <p class="text-xs text-slate-500 mb-5 font-medium">Panel de Control & Gestión</p>
 
-            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4 text-left">
+            <form id="login-form" onsubmit="window.handleLogin(event)" class="space-y-4 text-left">
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-xs font-semibold text-slate-600">Seleccionar Usuario</label>
-                        <button type="button" onclick="toggleUserManageView()" class="text-[11px] text-sky-600 font-bold hover:underline">
+                        <button type="button" onclick="window.toggleUserManageView()" class="text-[11px] text-sky-600 font-bold hover:underline">
                             <i class="fa-solid fa-user-gear"></i> Gestionar Cuentas
                         </button>
                     </div>
@@ -75,7 +75,7 @@
             <div id="user-manage-panel" class="hidden mt-4 pt-4 border-t border-slate-200 text-left space-y-3">
                 <h4 class="text-xs font-bold text-slate-800 flex items-center justify-between">
                     <span>Crear / Editar Usuario</span>
-                    <button type="button" onclick="toggleUserManageView()" class="text-slate-400 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                    <button type="button" onclick="window.toggleUserManageView()" class="text-slate-400 text-xs"><i class="fa-solid fa-xmark"></i></button>
                 </h4>
                 <div class="space-y-2">
                     <input type="text" id="um-name" placeholder="Nombre completo" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs">
@@ -87,8 +87,8 @@
                         <input type="password" id="um-pass" placeholder="Clave" class="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs">
                     </div>
                     <div class="flex gap-2">
-                        <button type="button" onclick="addUserSystem()" class="flex-grow py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700">Guardar</button>
-                        <button type="button" onclick="deleteSelectedUser()" class="py-1.5 px-3 bg-rose-100 text-rose-700 text-xs font-bold rounded-lg hover:bg-rose-200">Eliminar</button>
+                        <button type="button" onclick="window.addUserSystem()" class="flex-grow py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700">Guardar</button>
+                        <button type="button" onclick="window.deleteSelectedUser()" class="py-1.5 px-3 bg-rose-100 text-rose-700 text-xs font-bold rounded-lg hover:bg-rose-200">Eliminar</button>
                     </div>
                 </div>
             </div>
@@ -110,27 +110,27 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <button onclick="exportBackup()" title="Respaldar Datos" class="p-2 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs flex items-center gap-1 transition">
+                <button onclick="window.exportBackup()" title="Respaldar Datos" class="p-2 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs flex items-center gap-1 transition">
                     <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Guardar</span>
                 </button>
-                <button onclick="restoreDefaultData()" title="Reiniciar Datos" class="p-2 text-amber-400 hover:text-amber-300 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition">
+                <button onclick="window.restoreDefaultData()" title="Reiniciar Datos" class="p-2 text-amber-400 hover:text-amber-300 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition">
                     <i class="fa-solid fa-rotate-right"></i>
                 </button>
-                <button onclick="logout()" title="Cerrar Sesión" class="p-2 text-rose-400 hover:text-rose-300 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition">
+                <button onclick="window.logout()" title="Cerrar Sesión" class="p-2 text-rose-400 hover:text-rose-300 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition">
                     <i class="fa-solid fa-power-off"></i>
                 </button>
             </div>
         </header>
 
         <nav class="bg-white border-b border-slate-200 px-4 py-2 hidden md:flex items-center justify-around shadow-sm text-sm font-semibold text-slate-600">
-            <button onclick="switchTab('mod-1')" id="nav-mod-1" class="tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition hover:bg-slate-100 text-sky-600 bg-sky-50">
+            <button onclick="window.switchTab('mod-1')" id="nav-mod-1" class="tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition hover:bg-slate-100 text-sky-600 bg-sky-50">
                 <i class="fa-solid fa-tv text-lg"></i> 1. Plataformas & Cuentas
             </button>
-            <button onclick="switchTab('mod-2')" id="nav-mod-2" class="tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition hover:bg-slate-100">
+            <button onclick="window.switchTab('mod-2')" id="nav-mod-2" class="tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition hover:bg-slate-100">
                 <i class="fa-solid fa-hand-holding-dollar text-lg"></i> 2. Control de Cobros
                 <span id="badge-cobros" class="hidden bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
             </button>
-            <button onclick="switchTab('mod-3')" id="nav-mod-3" class="tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition hover:bg-slate-100">
+            <button onclick="window.switchTab('mod-3')" id="nav-mod-3" class="tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition hover:bg-slate-100">
                 <i class="fa-solid fa-file-invoice-dollar text-lg"></i> 3. Mis Pagos (Proveedores)
             </button>
         </nav>
@@ -145,7 +145,7 @@
                         </h2>
                         <p class="text-xs text-slate-500">Haz clic en cualquier plataforma para editar sus precios o gestionar perfiles.</p>
                     </div>
-                    <button onclick="openModalAddPlatform()" class="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center justify-center gap-2 transition active:scale-95">
+                    <button onclick="window.openModalAddPlatform()" class="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center justify-center gap-2 transition active:scale-95">
                         <i class="fa-solid fa-plus-circle text-sm"></i> Agregar Plataforma
                     </button>
                 </div>
@@ -183,18 +183,18 @@
                             <p class="text-xs text-slate-500">Alertas de cobro, recibos de pago y recordatorios directos por WhatsApp.</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="sendPendingWhatsAppSummary()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow transition">
+                            <button onclick="window.sendPendingWhatsAppSummary()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow transition">
                                 <i class="fa-brands fa-whatsapp text-sm"></i> Mensaje Morosos
                             </button>
-                            <input type="text" id="search-client" onkeyup="renderModule2()" placeholder="Buscar cliente..." class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-48">
+                            <input type="text" id="search-client" onkeyup="window.renderModule2()" placeholder="Buscar cliente..." class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-48">
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
-                        <button onclick="setCobrosFilter('all')" id="filter-all" class="filter-btn px-3 py-1.5 rounded-xl bg-slate-900 text-white shadow">Todos</button>
-                        <button onclick="setCobrosFilter('due_soon')" id="filter-due_soon" class="filter-btn px-3 py-1.5 rounded-xl bg-amber-100 text-amber-800 hover:bg-amber-200">Próximos 3 Días (<span id="count-due-soon">0</span>)</button>
-                        <button onclick="setCobrosFilter('expired')" id="filter-expired" class="filter-btn px-3 py-1.5 rounded-xl bg-rose-100 text-rose-800 hover:bg-rose-200">Vencidos (<span id="count-expired">0</span>)</button>
-                        <button onclick="setCobrosFilter('ok')" id="filter-ok" class="filter-btn px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 hover:bg-emerald-200">Al Día</button>
+                        <button onclick="window.setCobrosFilter('all')" id="filter-all" class="filter-btn px-3 py-1.5 rounded-xl bg-slate-900 text-white shadow">Todos</button>
+                        <button onclick="window.setCobrosFilter('due_soon')" id="filter-due_soon" class="filter-btn px-3 py-1.5 rounded-xl bg-amber-100 text-amber-800 hover:bg-amber-200">Próximos 3 Días (<span id="count-due-soon">0</span>)</button>
+                        <button onclick="window.setCobrosFilter('expired')" id="filter-expired" class="filter-btn px-3 py-1.5 rounded-xl bg-rose-100 text-rose-800 hover:bg-rose-200">Vencidos (<span id="count-expired">0</span>)</button>
+                        <button onclick="window.setCobrosFilter('ok')" id="filter-ok" class="filter-btn px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 hover:bg-emerald-200">Al Día</button>
                     </div>
                 </div>
 
@@ -243,16 +243,16 @@
         </main>
 
         <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-3 py-2 flex items-center justify-around z-30 shadow-lg">
-            <button onclick="switchTab('mod-1')" id="mob-nav-mod-1" class="mob-tab-btn flex flex-col items-center gap-1 text-sky-600 text-[11px] font-bold">
+            <button onclick="window.switchTab('mod-1')" id="mob-nav-mod-1" class="mob-tab-btn flex flex-col items-center gap-1 text-sky-600 text-[11px] font-bold">
                 <i class="fa-solid fa-tv text-lg"></i>
                 <span>Plataformas</span>
             </button>
-            <button onclick="switchTab('mod-2')" id="mob-nav-mod-2" class="mob-tab-btn flex flex-col items-center gap-1 text-slate-400 text-[11px] font-bold relative">
+            <button onclick="window.switchTab('mod-2')" id="mob-nav-mod-2" class="mob-tab-btn flex flex-col items-center gap-1 text-slate-400 text-[11px] font-bold relative">
                 <i class="fa-solid fa-hand-holding-dollar text-lg"></i>
                 <span>Cobros</span>
                 <span id="mob-badge-cobros" class="hidden absolute -top-1 right-2 bg-rose-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">0</span>
             </button>
-            <button onclick="switchTab('mod-3')" id="mob-nav-mod-3" class="mob-tab-btn flex flex-col items-center gap-1 text-slate-400 text-[11px] font-bold">
+            <button onclick="window.switchTab('mod-3')" id="mob-nav-mod-3" class="mob-tab-btn flex flex-col items-center gap-1 text-slate-400 text-[11px] font-bold">
                 <i class="fa-solid fa-file-invoice-dollar text-lg"></i>
                 <span>Mis Pagos</span>
             </button>
@@ -273,7 +273,7 @@
                         <p class="text-xs text-slate-300">Gestión de precios y cuentas</p>
                     </div>
                 </div>
-                <button onclick="closeModal('modal-platform-detail')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition">
+                <button onclick="window.closeModal('modal-platform-detail')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -293,7 +293,7 @@
                             <span class="text-[10px] font-bold text-slate-600">Cuenta L.:</span>
                             <input type="number" step="0.01" id="edit-plat-account-cost" class="w-20 px-2 py-1 bg-white border border-amber-300 rounded-lg text-xs font-bold text-slate-900">
                         </div>
-                        <button onclick="savePlatformPriceChanges()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow transition">
+                        <button onclick="window.savePlatformPriceChanges()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow transition">
                             Guardar
                         </button>
                     </div>
@@ -303,7 +303,7 @@
                     <div class="text-xs text-slate-600">
                         <span class="font-bold">Cuentas creadas:</span> <span id="detail-accounts-count">0</span> / 15
                     </div>
-                    <button id="btn-add-account" onclick="addNewAccountToPlatform()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
+                    <button id="btn-add-account" onclick="window.addNewAccountToPlatform()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
                         <i class="fa-solid fa-plus text-xs"></i> Agregar Cuenta
                     </button>
                 </div>
@@ -322,12 +322,12 @@
                     <h3 id="client-form-title" class="font-bold text-base text-slate-900">Asignar / Editar Cliente</h3>
                     <p id="client-form-subtitle" class="text-xs text-slate-500">Configura cliente y precio personalizado</p>
                 </div>
-                <button onclick="closeModal('modal-client-form')" class="text-slate-400 hover:text-slate-600">
+                <button onclick="window.closeModal('modal-client-form')" class="text-slate-400 hover:text-slate-600">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <form id="client-form" onsubmit="saveClientForm(event)" class="space-y-3 text-xs">
+            <form id="client-form" onsubmit="window.saveClientForm(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="cf-platform-id">
                 <input type="hidden" id="cf-account-id">
                 <input type="hidden" id="cf-profile-index">
@@ -340,7 +340,7 @@
                 <div class="space-y-2 border-t border-slate-100 pt-2">
                     <div class="flex items-center justify-between">
                         <label class="block font-bold text-slate-800">Plataformas y Cuentas a Asignar</label>
-                        <button type="button" onclick="addPlatformSelectionRow()" class="text-[11px] text-sky-600 font-bold hover:underline flex items-center gap-1">
+                        <button type="button" onclick="window.addPlatformSelectionRow()" class="text-[11px] text-sky-600 font-bold hover:underline flex items-center gap-1">
                             <i class="fa-solid fa-plus-circle"></i> Agregar otra plataforma
                         </button>
                     </div>
@@ -371,7 +371,7 @@
                 </div>
 
                 <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
-                    <button type="button" onclick="deleteClientFromForm()" id="btn-delete-client" class="hidden px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-xl transition text-xs">
+                    <button type="button" onclick="window.deleteClientFromForm()" id="btn-delete-client" class="hidden px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-xl transition text-xs">
                         <i class="fa-solid fa-trash"></i> Liberar Perfil
                     </button>
                     <button type="submit" class="flex-grow py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-md transition text-xs flex items-center justify-center gap-1.5">
@@ -387,12 +387,12 @@
         <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-5 border border-slate-200 my-auto space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                 <h3 class="font-bold text-base text-slate-900">Agregar Nueva Plataforma</h3>
-                <button onclick="closeModal('modal-add-platform')" class="text-slate-400 hover:text-slate-600">
+                <button onclick="window.closeModal('modal-add-platform')" class="text-slate-400 hover:text-slate-600">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <form onsubmit="saveNewPlatform(event)" class="space-y-3 text-xs">
+            <form onsubmit="window.saveNewPlatform(event)" class="space-y-3 text-xs">
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Nombre de la Plataforma *</label>
                     <input type="text" id="np-name" required placeholder="Ej: Apple TV+" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-medium">
@@ -421,7 +421,7 @@
         <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-5 border border-slate-200 my-auto space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                 <h3 class="font-bold text-sm text-slate-800">Recibo Digital de Pago</h3>
-                <button onclick="closeModal('modal-receipt')" class="text-slate-400 hover:text-slate-600">
+                <button onclick="window.closeModal('modal-receipt')" class="text-slate-400 hover:text-slate-600">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -459,8 +459,11 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
+    <!-- JAVASCRIPT LOGIC CON FIREBASE INTEGRADO -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
         // System Initial Data
         const DEFAULT_USERS = [
             { id: 'u1', name: 'Josué Maldonado', role: 'Administrador', pass: '1234' },
@@ -474,55 +477,89 @@
             { id: 'p4', name: 'Spotify', icon: 'fa-music', color: 'bg-emerald-500', profilePrice: 60, accountCost: 150, maxProfiles: 6, accounts: [] }
         ];
 
-        let users = JSON.parse(localStorage.getItem('jc_users')) || DEFAULT_USERS;
-        let platforms = JSON.parse(localStorage.getItem('jc_platforms')) || DEFAULT_PLATFORMS;
-        let currentUser = null;
-        let activeTab = 'mod-1';
-        let cobrosFilter = 'all';
-        let currentEditingPlatformId = null;
+        window.users = JSON.parse(localStorage.getItem('jc_users')) || DEFAULT_USERS;
+        window.platforms = JSON.parse(localStorage.getItem('jc_platforms')) || DEFAULT_PLATFORMS;
+        window.currentUser = null;
+        window.activeTab = 'mod-1';
+        window.cobrosFilter = 'all';
+        window.currentEditingPlatformId = null;
 
-        // Initialize App
-        window.addEventListener('DOMContentLoaded', () => {
-            populateUserDropdown();
-            renderApp();
-        });
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROJECT.firebaseapp.com",
+            databaseURL: "https://TU_PROJECT-default-rtdb.firebaseio.com",
+            projectId: "TU_PROJECT",
+            storageBucket: "TU_PROJECT.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef"
+        };
 
-        function saveData() {
-            localStorage.setItem('jc_users', JSON.stringify(users));
-            localStorage.setItem('jc_platforms', JSON.stringify(platforms));
+        let db = null;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getDatabase(app);
+
+            // Escuchar cambios en Firebase en tiempo real
+            onValue(ref(db, 'jc_streaming_data'), (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.users) window.users = data.users;
+                    if (data.platforms) window.platforms = data.platforms;
+                    localStorage.setItem('jc_users', JSON.stringify(window.users));
+                    localStorage.setItem('jc_platforms', JSON.stringify(window.platforms));
+                    window.populateUserDropdown();
+                    window.renderApp();
+                }
+            });
+        } catch (e) {
+            console.log("Firebase no configurado o sin conexión. Usando almacenamiento local.");
         }
 
-        function populateUserDropdown() {
+        window.saveData = function() {
+            localStorage.setItem('jc_users', JSON.stringify(window.users));
+            localStorage.setItem('jc_platforms', JSON.stringify(window.platforms));
+
+            if (db) {
+                set(ref(db, 'jc_streaming_data'), {
+                    users: window.users,
+                    platforms: window.platforms
+                });
+            }
+        };
+
+        window.populateUserDropdown = function() {
             const select = document.getElementById('login-user-select');
-            select.innerHTML = users.map(u => `<option value="${u.id}">${u.name} (${u.role})</option>`).join('');
-        }
+            if (!select) return;
+            select.innerHTML = window.users.map(u => `<option value="${u.id}">${u.name} (${u.role})</option>`).join('');
+        };
 
-        function toggleUserManageView() {
+        window.toggleUserManageView = function() {
             const panel = document.getElementById('user-manage-panel');
             panel.classList.toggle('hidden');
-        }
+        };
 
-        function handleLogin(e) {
+        window.handleLogin = function(e) {
             e.preventDefault();
             const userId = document.getElementById('login-user-select').value;
             const pass = document.getElementById('login-pass').value;
-            const user = users.find(u => u.id === userId);
+            const user = window.users.find(u => u.id === userId);
 
             if (user && user.pass === pass) {
-                currentUser = user;
+                window.currentUser = user;
                 document.getElementById('active-user-display').innerText = `Usuario: ${user.name}`;
                 document.getElementById('login-modal').classList.add('hidden');
             } else {
                 alert('Contraseña incorrecta');
             }
-        }
+        };
 
-        function logout() {
-            currentUser = null;
+        window.logout = function() {
+            window.currentUser = null;
             document.getElementById('login-modal').classList.remove('hidden');
-        }
+        };
 
-        function addUserSystem() {
+        window.addUserSystem = function() {
             const name = document.getElementById('um-name').value.trim();
             const role = document.getElementById('um-role').value;
             const pass = document.getElementById('um-pass').value.trim();
@@ -533,28 +570,28 @@
             }
 
             const newUser = { id: 'u_' + Date.now(), name, role, pass };
-            users.push(newUser);
-            saveData();
-            populateUserDropdown();
+            window.users.push(newUser);
+            window.saveData();
+            window.populateUserDropdown();
             document.getElementById('um-name').value = '';
             document.getElementById('um-pass').value = '';
             alert('Usuario guardado exitosamente');
-        }
+        };
 
-        function deleteSelectedUser() {
+        window.deleteSelectedUser = function() {
             const userId = document.getElementById('login-user-select').value;
-            if (users.length <= 1) {
+            if (window.users.length <= 1) {
                 alert('Debe existir al menos un usuario en el sistema');
                 return;
             }
-            users = users.filter(u => u.id !== userId);
-            saveData();
-            populateUserDropdown();
+            window.users = window.users.filter(u => u.id !== userId);
+            window.saveData();
+            window.populateUserDropdown();
             alert('Usuario eliminado');
-        }
+        };
 
-        function switchTab(tabId) {
-            activeTab = tabId;
+        window.switchTab = function(tabId) {
+            window.activeTab = tabId;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
 
@@ -574,22 +611,22 @@
                 mobNav.classList.remove('text-slate-400');
             }
 
-            renderApp();
-        }
+            window.renderApp();
+        };
 
-        function renderApp() {
-            renderModule1();
-            renderModule2();
-            renderModule3();
-        }
+        window.renderApp = function() {
+            window.renderModule1();
+            window.renderModule2();
+            window.renderModule3();
+        };
 
-        function renderModule1() {
+        window.renderModule1 = function() {
             const grid = document.getElementById('platforms-grid');
             let totalAccounts = 0;
             let occupiedProfiles = 0;
             let freeProfiles = 0;
 
-            grid.innerHTML = platforms.map(p => {
+            grid.innerHTML = window.platforms.map(p => {
                 let pAccounts = p.accounts ? p.accounts.length : 0;
                 let pOccupied = 0;
                 let pTotalProfiles = pAccounts * (p.maxProfiles || 5);
@@ -607,7 +644,7 @@
                 freeProfiles += (pTotalProfiles - pOccupied);
 
                 return `
-                    <div onclick="openPlatformDetail('${p.id}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md cursor-pointer transition flex flex-col justify-between">
+                    <div onclick="window.openPlatformDetail('${p.id}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md cursor-pointer transition flex flex-col justify-between">
                         <div class="flex items-center gap-3 mb-3">
                             <div class="w-10 h-10 ${p.color || 'bg-slate-800'} text-white rounded-xl flex items-center justify-center text-lg font-bold">
                                 <i class="fa-solid ${p.icon || 'fa-tv'}"></i>
@@ -631,15 +668,15 @@
                 `;
             }).join('');
 
-            document.getElementById('stat-total-platforms').innerText = platforms.length;
+            document.getElementById('stat-total-platforms').innerText = window.platforms.length;
             document.getElementById('stat-total-accounts').innerText = totalAccounts;
             document.getElementById('stat-occupied-profiles').innerText = occupiedProfiles;
             document.getElementById('stat-free-profiles').innerText = freeProfiles;
-        }
+        };
 
-        function openPlatformDetail(platformId) {
-            currentEditingPlatformId = platformId;
-            const platform = platforms.find(p => p.id === platformId);
+        window.openPlatformDetail = function(platformId) {
+            window.currentEditingPlatformId = platformId;
+            const platform = window.platforms.find(p => p.id === platformId);
             if (!platform) return;
 
             document.getElementById('detail-platform-name').innerText = platform.name;
@@ -647,11 +684,11 @@
             document.getElementById('edit-plat-account-cost').value = platform.accountCost;
             document.getElementById('detail-accounts-count').innerText = platform.accounts ? platform.accounts.length : 0;
 
-            renderPlatformAccounts(platform);
+            window.renderPlatformAccounts(platform);
             document.getElementById('modal-platform-detail').classList.remove('hidden');
-        }
+        };
 
-        function renderPlatformAccounts(platform) {
+        window.renderPlatformAccounts = function(platform) {
             const container = document.getElementById('accounts-container');
             if (!platform.accounts || platform.accounts.length === 0) {
                 container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No hay cuentas registradas en esta plataforma.</p>`;
@@ -665,13 +702,13 @@
                             <span class="text-xs font-bold text-slate-800">Cuenta #${aIdx + 1}: ${acc.email}</span>
                             <p class="text-[10px] text-slate-400">Clave: ${acc.pass || 'Sin Clave'}</p>
                         </div>
-                        <button onclick="deleteAccount('${platform.id}', '${acc.id}')" class="text-rose-500 hover:text-rose-700 text-xs">
+                        <button onclick="window.deleteAccount('${platform.id}', '${acc.id}')" class="text-rose-500 hover:text-rose-700 text-xs">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
                         ${acc.profiles.map((prof, pIdx) => `
-                            <button onclick="openClientForm('${platform.id}', '${acc.id}', ${pIdx})" class="p-2 rounded-xl text-left border ${prof.clientName ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200 hover:border-slate-300'} transition">
+                            <button onclick="window.openClientForm('${platform.id}', '${acc.id}', ${pIdx})" class="p-2 rounded-xl text-left border ${prof.clientName ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200 hover:border-slate-300'} transition">
                                 <span class="text-[10px] font-bold block ${prof.clientName ? 'text-emerald-700' : 'text-slate-500'}">Perfil ${pIdx + 1}</span>
                                 <span class="text-xs font-semibold truncate block text-slate-800">${prof.clientName || 'Disponible'}</span>
                             </button>
@@ -679,10 +716,10 @@
                     </div>
                 </div>
             `).join('');
-        }
+        };
 
-        function addNewAccountToPlatform() {
-            const platform = platforms.find(p => p.id === currentEditingPlatformId);
+        window.addNewAccountToPlatform = function() {
+            const platform = window.platforms.find(p => p.id === window.currentEditingPlatformId);
             if (!platform) return;
 
             const email = prompt("Ingrese el correo de la nueva cuenta:");
@@ -698,40 +735,40 @@
 
             if (!platform.accounts) platform.accounts = [];
             platform.accounts.push(newAcc);
-            saveData();
-            openPlatformDetail(platform.id);
-            renderModule1();
-        }
+            window.saveData();
+            window.openPlatformDetail(platform.id);
+            window.renderModule1();
+        };
 
-        function deleteAccount(platformId, accountId) {
+        window.deleteAccount = function(platformId, accountId) {
             if (!confirm("¿Está seguro de eliminar esta cuenta y sus perfiles asociados?")) return;
-            const platform = platforms.find(p => p.id === platformId);
+            const platform = window.platforms.find(p => p.id === platformId);
             if (!platform) return;
 
             platform.accounts = platform.accounts.filter(a => a.id !== accountId);
-            saveData();
-            openPlatformDetail(platform.id);
-            renderModule1();
-        }
+            window.saveData();
+            window.openPlatformDetail(platform.id);
+            window.renderModule1();
+        };
 
-        function savePlatformPriceChanges() {
-            const platform = platforms.find(p => p.id === currentEditingPlatformId);
+        window.savePlatformPriceChanges = function() {
+            const platform = window.platforms.find(p => p.id === window.currentEditingPlatformId);
             if (!platform) return;
 
             platform.profilePrice = parseFloat(document.getElementById('edit-plat-profile-price').value) || 0;
             platform.accountCost = parseFloat(document.getElementById('edit-plat-account-cost').value) || 0;
 
-            saveData();
+            window.saveData();
             alert('Precios actualizados');
-            renderModule1();
-        }
+            window.renderModule1();
+        };
 
-        function openClientForm(platformId, accountId, profileIndex) {
+        window.openClientForm = function(platformId, accountId, profileIndex) {
             document.getElementById('cf-platform-id').value = platformId;
             document.getElementById('cf-account-id').value = accountId;
             document.getElementById('cf-profile-index').value = profileIndex;
 
-            const platform = platforms.find(p => p.id === platformId);
+            const platform = window.platforms.find(p => p.id === platformId);
             const account = platform ? platform.accounts.find(a => a.id === accountId) : null;
             const profile = account ? account.profiles[profileIndex] : null;
 
@@ -749,17 +786,17 @@
                 document.getElementById('btn-delete-client').classList.add('hidden');
             }
 
-            renderMultiPlatformSelection(platformId, accountId);
+            window.renderMultiPlatformSelection(platformId, accountId);
             document.getElementById('modal-client-form').classList.remove('hidden');
-        }
+        };
 
-        function renderMultiPlatformSelection(initialPlatformId, initialAccountId) {
+        window.renderMultiPlatformSelection = function(initialPlatformId, initialAccountId) {
             const container = document.getElementById('multi-platform-container');
             container.innerHTML = '';
-            addPlatformSelectionRow(initialPlatformId, initialAccountId);
-        }
+            window.addPlatformSelectionRow(initialPlatformId, initialAccountId);
+        };
 
-        function addPlatformSelectionRow(selectedPlatId = '', selectedAccId = '') {
+        window.addPlatformSelectionRow = function(selectedPlatId = '', selectedAccId = '') {
             const container = document.getElementById('multi-platform-container');
             const rowId = 'plat_row_' + Date.now() + Math.random().toString(36).substring(2, 5);
 
@@ -769,9 +806,9 @@
 
             row.innerHTML = `
                 <div class="col-span-5">
-                    <select onchange="onPlatformSelectChange('${rowId}')" class="plat-select w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">
+                    <select onchange="window.onPlatformSelectChange('${rowId}')" class="plat-select w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">
                         <option value="">Seleccionar Plataforma</option>
-                        ${platforms.map(p => `<option value="${p.id}" ${p.id === selectedPlatId ? 'selected' : ''}>${p.name}</option>`).join('')}
+                        ${window.platforms.map(p => `<option value="${p.id}" ${p.id === selectedPlatId ? 'selected' : ''}>${p.name}</option>`).join('')}
                     </select>
                 </div>
                 <div class="col-span-6">
@@ -789,19 +826,19 @@
             container.appendChild(row);
 
             if (selectedPlatId) {
-                populateAccountOptionsForRow(row, selectedPlatId, selectedAccId);
+                window.populateAccountOptionsForRow(row, selectedPlatId, selectedAccId);
             }
-        }
+        };
 
-        function onPlatformSelectChange(rowId) {
+        window.onPlatformSelectChange = function(rowId) {
             const row = document.getElementById(rowId);
             const platId = row.querySelector('.plat-select').value;
-            populateAccountOptionsForRow(row, platId, '');
-        }
+            window.populateAccountOptionsForRow(row, platId, '');
+        };
 
-        function populateAccountOptionsForRow(row, platformId, selectedAccId) {
+        window.populateAccountOptionsForRow = function(row, platformId, selectedAccId) {
             const accSelect = row.querySelector('.acc-select');
-            const platform = platforms.find(p => p.id === platformId);
+            const platform = window.platforms.find(p => p.id === platformId);
 
             if (!platform || !platform.accounts || platform.accounts.length === 0) {
                 accSelect.innerHTML = `<option value="">Sin cuentas disponibles</option>`;
@@ -815,9 +852,9 @@
             });
 
             accSelect.innerHTML = optionsHtml;
-        }
+        };
 
-        function saveClientForm(e) {
+        window.saveClientForm = function(e) {
             e.preventDefault();
             const name = document.getElementById('cf-name').value.trim();
             const pin = document.getElementById('cf-pin').value.trim();
@@ -836,7 +873,7 @@
                 const accId = row.querySelector('.acc-select').value;
 
                 if (platId && accId) {
-                    const platform = platforms.find(p => p.id === platId);
+                    const platform = window.platforms.find(p => p.id === platId);
                     if (platform) {
                         const account = platform.accounts.find(a => a.id === accId);
                         if (account) {
@@ -856,19 +893,19 @@
                 }
             });
 
-            saveData();
-            closeModal('modal-client-form');
-            if (currentEditingPlatformId) openPlatformDetail(currentEditingPlatformId);
-            renderApp();
-        }
+            window.saveData();
+            window.closeModal('modal-client-form');
+            if (window.currentEditingPlatformId) window.openPlatformDetail(window.currentEditingPlatformId);
+            window.renderApp();
+        };
 
-        function deleteClientFromForm() {
+        window.deleteClientFromForm = function() {
             if (!confirm("¿Está seguro de liberar este perfil?")) return;
             const platformId = document.getElementById('cf-platform-id').value;
             const accountId = document.getElementById('cf-account-id').value;
             const profileIndex = parseInt(document.getElementById('cf-profile-index').value);
 
-            const platform = platforms.find(p => p.id === platformId);
+            const platform = window.platforms.find(p => p.id === platformId);
             if (platform) {
                 const account = platform.accounts.find(a => a.id === accountId);
                 if (account && account.profiles[profileIndex]) {
@@ -882,14 +919,13 @@
                 }
             }
 
-            saveData();
-            closeModal('modal-client-form');
-            if (currentEditingPlatformId) openPlatformDetail(currentEditingPlatformId);
-            renderApp();
-        }
+            window.saveData();
+            window.closeModal('modal-client-form');
+            if (window.currentEditingPlatformId) window.openPlatformDetail(window.currentEditingPlatformId);
+            window.renderApp();
+        };
 
-        // --- MÓDULO 2: CÁLCULO DE FECHAS, FILTROS Y OPCIÓN "MARCAR COMO PAGADO" ---
-        function getNextDueDate(startDateStr) {
+        window.getNextDueDate = function(startDateStr) {
             if (!startDateStr) return null;
             const start = new Date(startDateStr + 'T00:00:00');
             if (isNaN(start.getTime())) return null;
@@ -902,20 +938,19 @@
                 due.setMonth(due.getMonth() + 1);
             }
             return due;
-        }
+        };
 
-        function calculateDaysDiff(dueDate) {
+        window.calculateDaysDiff = function(dueDate) {
             if (!dueDate) return 999;
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
             const diffTime = dueDate.getTime() - today.getTime();
             return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        }
+        };
 
-        // FUNCIÓN AGREGADA: MARCAR COMO PAGADO Y ADELANTAR FECHA
-        function markAsPaid(clientName) {
-            platforms.forEach(p => {
+        window.markAsPaid = function(clientName) {
+            window.platforms.forEach(p => {
                 if (p.accounts) {
                     p.accounts.forEach(acc => {
                         if (acc.profiles) {
@@ -933,12 +968,12 @@
                 }
             });
 
-            saveData();
-            renderModule2();
-        }
+            window.saveData();
+            window.renderModule2();
+        };
 
-        function setCobrosFilter(filter) {
-            cobrosFilter = filter;
+        window.setCobrosFilter = function(filter) {
+            window.cobrosFilter = filter;
 
             const btnMap = {
                 'all': 'filter-all',
@@ -960,15 +995,15 @@
                 activeBtn.className = 'filter-btn px-3 py-1.5 rounded-xl bg-slate-900 text-white shadow';
             }
 
-            renderModule2();
-        }
+            window.renderModule2();
+        };
 
-        function renderModule2() {
+        window.renderModule2 = function() {
             const container = document.getElementById('clients-cobro-list');
             const search = document.getElementById('search-client').value.toLowerCase();
             let clientsMap = {};
 
-            platforms.forEach(p => {
+            window.platforms.forEach(p => {
                 if (p.accounts) {
                     p.accounts.forEach(acc => {
                         if (acc.profiles) {
@@ -998,8 +1033,8 @@
             let expiredCount = 0;
 
             clientsList.forEach(c => {
-                const nextDue = getNextDueDate(c.startDate);
-                const daysLeft = calculateDaysDiff(nextDue);
+                const nextDue = window.getNextDueDate(c.startDate);
+                const daysLeft = window.calculateDaysDiff(nextDue);
                 c.nextDue = nextDue;
                 c.daysLeft = daysLeft;
 
@@ -1033,11 +1068,11 @@
 
             let filteredList = clientsList.filter(c => c.name.toLowerCase().includes(search));
 
-            if (cobrosFilter === 'due_soon') {
+            if (window.cobrosFilter === 'due_soon') {
                 filteredList = filteredList.filter(c => c.status === 'due_soon');
-            } else if (cobrosFilter === 'expired') {
+            } else if (window.cobrosFilter === 'expired') {
                 filteredList = filteredList.filter(c => c.status === 'expired');
-            } else if (cobrosFilter === 'ok') {
+            } else if (window.cobrosFilter === 'ok') {
                 filteredList = filteredList.filter(c => c.status === 'ok');
             }
 
@@ -1063,10 +1098,10 @@
                         </div>
                         <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                             <span class="text-sm font-extrabold text-emerald-600 mr-1">L. ${c.totalPrice.toFixed(2)}</span>
-                            <button onclick="markAsPaid('${c.name}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1">
+                            <button onclick="window.markAsPaid('${c.name}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1">
                                 <i class="fa-solid fa-circle-check"></i> Marcar Pagado
                             </button>
-                            <button onclick="openReceipt('${c.name}', '${c.platforms.join(', ')}', ${c.totalPrice})" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1">
+                            <button onclick="window.openReceipt('${c.name}', '${c.platforms.join(', ')}', ${c.totalPrice})" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1">
                                 <i class="fa-solid fa-file-invoice"></i> Recibo
                             </button>
                         </div>
@@ -1077,9 +1112,9 @@
             if (filteredList.length === 0) {
                 container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No hay registros de clientes para este filtro.</p>`;
             }
-        }
+        };
 
-        function openReceipt(clientName, platformName, amount) {
+        window.openReceipt = function(clientName, platformName, amount) {
             document.getElementById('rec-id').innerText = 'REC-' + Math.floor(1000 + Math.random() * 9000);
             document.getElementById('rec-client-name').innerText = clientName;
             document.getElementById('rec-date').innerText = new Date().toLocaleDateString();
@@ -1088,15 +1123,15 @@
             document.getElementById('rec-amount').innerText = `L. ${amount.toFixed(2)}`;
 
             document.getElementById('modal-receipt').classList.remove('hidden');
-        }
+        };
 
-        function renderModule3() {
+        window.renderModule3 = function() {
             let totalIncome = 0;
             let totalExpenses = 0;
             const container = document.getElementById('provider-payments-list');
             let accountsListHtml = '';
 
-            platforms.forEach(p => {
+            window.platforms.forEach(p => {
                 if (p.accounts) {
                     p.accounts.forEach((acc, idx) => {
                         totalExpenses += (p.accountCost || 0);
@@ -1131,13 +1166,13 @@
             document.getElementById('fin-profit').innerText = `L. ${(totalIncome - totalExpenses).toFixed(2)}`;
 
             container.innerHTML = accountsListHtml || `<p class="text-xs text-slate-400 text-center py-4">No hay cuentas para calcular.</p>`;
-        }
+        };
 
-        function openModalAddPlatform() {
+        window.openModalAddPlatform = function() {
             document.getElementById('modal-add-platform').classList.remove('hidden');
-        }
+        };
 
-        function saveNewPlatform(e) {
+        window.saveNewPlatform = function(e) {
             e.preventDefault();
             const name = document.getElementById('np-name').value.trim();
             const profilePrice = parseFloat(document.getElementById('np-profile-price').value) || 0;
@@ -1154,41 +1189,47 @@
                 accounts: []
             };
 
-            platforms.push(newPlatform);
-            saveData();
-            closeModal('modal-add-platform');
-            renderModule1();
-        }
+            window.platforms.push(newPlatform);
+            window.saveData();
+            window.closeModal('modal-add-platform');
+            window.renderModule1();
+        };
 
-        function closeModal(id) {
+        window.closeModal = function(id) {
             document.getElementById(id).classList.add('hidden');
-        }
+        };
 
-        function exportBackup() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ users, platforms }));
+        window.exportBackup = function() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ users: window.users, platforms: window.platforms }));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
             downloadAnchor.setAttribute("download", "jc_streaming_backup.json");
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
-        }
+        };
 
-        function restoreDefaultData() {
+        window.restoreDefaultData = function() {
             if (confirm("¿Desea restablecer todos los datos a su estado inicial?")) {
                 localStorage.removeItem('jc_users');
                 localStorage.removeItem('jc_platforms');
-                users = DEFAULT_USERS;
-                platforms = DEFAULT_PLATFORMS;
-                saveData();
-                populateUserDropdown();
-                renderApp();
+                window.users = DEFAULT_USERS;
+                window.platforms = DEFAULT_PLATFORMS;
+                window.saveData();
+                window.populateUserDropdown();
+                window.renderApp();
             }
-        }
+        };
 
-        function sendPendingWhatsAppSummary() {
+        window.sendPendingWhatsAppSummary = function() {
             alert('Función de envío masivo en proceso...');
-        }
+        };
+
+        // Inicialización tras cargar el DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            window.populateUserDropdown();
+            window.renderApp();
+        });
     </script>
 </body>
 </html>
