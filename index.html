@@ -1,0 +1,2360 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JC Streaming - Sistema de Gestión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { -webkit-tap-highlight-color: transparent; user-select: none; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @media print {
+            body * { visibility: hidden; }
+            #printable-receipt, #printable-receipt * { visibility: visible; }
+            #printable-receipt { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans min-h-screen pb-20 md:pb-6 transition-colors duration-200">
+
+    <!-- LOGIN SCREEN & USER MANAGEMENT MODAL -->
+    <div id="login-modal" class="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 transition-all">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-sm w-full p-6 text-center border border-slate-200 dark:border-slate-700">
+            <div class="w-20 h-20 mx-auto mb-3 rounded-2xl bg-slate-900 text-amber-400 border border-slate-700 p-2 flex items-center justify-center shadow-inner">
+                <i class="fa-solid fa-play text-3xl"></i>
+            </div>
+            <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">JC Streaming</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-5 font-medium">Panel de Control & Gestión</p>
+
+            <form id="login-form" onsubmit="window.handleLogin(event)" class="space-y-4 text-left">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300">Seleccionar Usuario</label>
+                        <button type="button" onclick="window.toggleUserManageView()" class="text-[11px] text-sky-600 dark:text-sky-400 font-bold hover:underline">
+                            <i class="fa-solid fa-user-gear"></i> Gestionar Cuentas
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-user-tag text-sm"></i>
+                        </span>
+                        <select id="login-user-select" class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Contraseña de Acceso</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </span>
+                        <input type="password" id="login-pass" placeholder="Ingresa tu contraseña" required class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-lg shadow-sky-600/30 transition-all active:scale-95 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                </button>
+            </form>
+
+            <div id="user-manage-panel" class="hidden mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 text-left space-y-3">
+                <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                    <span>Crear / Editar Usuario</span>
+                    <button type="button" onclick="window.toggleUserManageView()" class="text-slate-400 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                </h4>
+                <div class="space-y-2">
+                    <input type="text" id="um-name" placeholder="Nombre completo" class="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs text-slate-800 dark:text-white">
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="um-role" class="px-2.5 py-1.5 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-800 dark:text-white">
+                            <option value="Administrador">Admin</option>
+                            <option value="Operador">Operador</option>
+                        </select>
+                        <input type="password" id="um-pass" placeholder="Clave" class="px-2.5 py-1.5 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs text-slate-800 dark:text-white">
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="window.addUserSystem()" class="flex-grow py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700">Guardar</button>
+                        <button type="button" onclick="window.deleteSelectedUser()" class="py-1.5 px-3 bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 text-xs font-bold rounded-lg hover:bg-rose-200">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="app-wrapper" class="max-w-4xl mx-auto min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 shadow-xl border-x border-slate-200 dark:border-slate-800">
+
+        <header class="bg-slate-900 text-white p-4 sticky top-0 z-30 shadow-md flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-amber-500 rounded-xl p-1 text-slate-900 flex items-center justify-center font-black text-xl shadow">
+                    <i class="fa-solid fa-play"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base tracking-tight leading-none text-white">JC Streaming</h1>
+                    <span id="active-user-display" class="text-[10px] text-sky-400 font-medium tracking-wide uppercase">Usuario: Josué Maldonado</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="window.toggleDarkMode()" title="Cambiar Tema" class="p-2 text-amber-400 hover:text-amber-300 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition">
+                    <i id="theme-toggle-icon" class="fa-solid fa-sun"></i>
+                </button>
+                <button onclick="window.exportBackup()" title="Respaldar Datos" class="p-2 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs flex items-center gap-1 transition">
+                    <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Guardar</span>
+                </button>
+                <button onclick="window.logout()" title="Cerrar Sesión" class="p-2 text-rose-400 hover:text-rose-300 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+        </header>
+
+        <nav class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-2 hidden md:flex items-center justify-around shadow-sm text-sm font-semibold text-slate-600 dark:text-slate-300 sticky top-14 z-20">
+            <button onclick="window.switchTab('mod-1')" id="nav-mod-1" class="tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition hover:bg-slate-100 dark:hover:bg-slate-700 text-sky-600 bg-sky-50 dark:bg-slate-700 dark:text-sky-400">
+                <i class="fa-solid fa-tv text-lg"></i> 1. Plataformas & Cuentas
+            </button>
+            <button onclick="window.switchTab('mod-2')" id="nav-mod-2" class="tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-hand-holding-dollar text-lg"></i> 2. Control de Cobros
+                <span id="badge-cobros" class="hidden bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
+            <button onclick="window.switchTab('mod-3')" id="nav-mod-3" class="tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-file-invoice-dollar text-lg"></i> 3. Mis Pagos (Proveedores)
+            </button>
+            <button onclick="window.switchTab('mod-4')" id="nav-mod-4" class="tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-chart-pie text-lg"></i> 4. Informe Mensual
+            </button>
+        </nav>
+
+        <main class="flex-grow p-4 md:p-6 space-y-6">
+
+            <!-- MÓDULO 1: PLATAFORMAS -->
+            <section id="mod-1" class="tab-content space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-border-all text-sky-600 dark:text-sky-400"></i> Módulo 1: Catálogo de Plataformas
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Haz clic en cualquier plataforma para editar sus precios, ícono o gestionar perfiles.</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                        <button onclick="window.openQuickAddClient()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center justify-center gap-2 transition active:scale-95">
+                            <i class="fa-solid fa-user-plus text-sm"></i> Agregar Cliente
+                        </button>
+                        <button onclick="window.openModalAddPlatform()" class="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center justify-center gap-2 transition active:scale-95">
+                            <i class="fa-solid fa-plus-circle text-sm"></i> Agregar Plataforma
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="bg-sky-50 dark:bg-slate-800 border border-sky-100 dark:border-slate-700 p-3 rounded-2xl text-center">
+                        <span class="block text-[11px] font-medium text-sky-600 dark:text-sky-400">Total Plataformas</span>
+                        <span id="stat-total-platforms" class="text-xl font-black text-sky-900 dark:text-sky-200">0</span>
+                    </div>
+                    <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 p-3 rounded-2xl text-center">
+                        <span class="block text-[11px] font-medium text-indigo-600 dark:text-indigo-400">Cuentas Activas</span>
+                        <span id="stat-total-accounts" class="text-xl font-black text-indigo-900 dark:text-indigo-200">0</span>
+                    </div>
+                    <div class="bg-emerald-50 dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 p-3 rounded-2xl text-center">
+                        <span class="block text-[11px] font-medium text-emerald-600 dark:text-emerald-400">Perfiles Ocupados</span>
+                        <span id="stat-occupied-profiles" class="text-xl font-black text-emerald-900 dark:text-emerald-200">0</span>
+                    </div>
+                    <div class="bg-amber-50 dark:bg-slate-800 border border-amber-100 dark:border-slate-700 p-3 rounded-2xl text-center">
+                        <span class="block text-[11px] font-medium text-amber-600 dark:text-amber-400">Perfiles Libres</span>
+                        <span id="stat-free-profiles" class="text-xl font-black text-amber-900 dark:text-amber-200">0</span>
+                    </div>
+                </div>
+
+                <div id="platforms-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+                </div>
+            </section>
+
+            <!-- MÓDULO 2: COBROS -->
+            <section id="mod-2" class="tab-content hidden space-y-5">
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <i class="fa-solid fa-hand-holding-dollar text-emerald-600 dark:text-emerald-400"></i> Módulo 2: Control de Cobros
+                            </h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Alertas de cobro, recibos de pago y reporte enviado por WhatsApp.</p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                            <input type="text" id="target-whatsapp" placeholder="Tel. WhatsApp (ej. 50499999999)" class="px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-56">
+                            <button onclick="window.sendPendingWhatsAppSummary()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow transition whitespace-nowrap">
+                                <i class="fa-brands fa-whatsapp text-sm"></i> Mensaje Morosos
+                            </button>
+                            <input type="text" id="search-client" onkeyup="window.renderModule2()" placeholder="Buscar cliente..." class="px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-48">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
+                        <button onclick="window.setCobrosFilter('all')" id="filter-all" class="filter-btn px-3 py-1.5 rounded-xl bg-slate-900 text-white shadow">Todos</button>
+                        <button onclick="window.setCobrosFilter('due_soon')" id="filter-due_soon" class="filter-btn px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 hover:bg-amber-200">Próximos 3 Días (<span id="count-due-soon">0</span>)</button>
+                        <button onclick="window.setCobrosFilter('expired')" id="filter-expired" class="filter-btn px-3 py-1.5 rounded-xl bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-300 hover:bg-rose-200">Vencidos (<span id="count-expired">0</span>)</button>
+                        <button onclick="window.setCobrosFilter('ok')" id="filter-ok" class="filter-btn px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200">Al Día</button>
+                    </div>
+                </div>
+
+                <div id="clients-cobro-list" class="space-y-3">
+                </div>
+            </section>
+
+            <!-- MÓDULO 3: MIS PAGOS (PROVEEDORES) -->
+            <section id="mod-3" class="tab-content hidden space-y-5">
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-file-invoice-dollar text-purple-600 dark:text-purple-400"></i> Módulo 3: Mis Pagos de Cuentas (Proveedores)
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Control de vencimiento y costos de las cuentas registradas por pagar.</p>
+                    </div>
+                </div>
+
+                <!-- PANEL DE NOTIFICACIONES MOVIDO EXCLUSIVAMENTE AQUÍ -->
+                <div id="notifications-panel" class="bg-white dark:bg-slate-800 border border-amber-200 dark:border-slate-700 rounded-2xl p-4 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-bell text-amber-500"></i> Panel de Recordatorios y Notificaciones
+                        </h3>
+                        <span class="text-[11px] text-slate-400 font-medium">Alertas activas</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- NOTIFICACIONES DE CLIENTES -->
+                        <div class="bg-amber-50/60 dark:bg-slate-900/50 border border-amber-200 dark:border-amber-900/50 rounded-xl p-3 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-users text-amber-600 dark:text-amber-400"></i> Cobros a Clientes (Por vencer / Vencidos)
+                                </span>
+                                <span id="notif-client-count" class="bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
+                            </div>
+                            <div id="notif-client-list" class="space-y-1.5 max-h-36 overflow-y-auto text-xs pr-1">
+                                <!-- JS Inject -->
+                            </div>
+                        </div>
+
+                        <!-- NOTIFICACIONES DE CUENTAS PROVEEDORES -->
+                        <div class="bg-rose-50/60 dark:bg-slate-900/50 border border-rose-200 dark:border-rose-900/50 rounded-xl p-3 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-rose-900 dark:text-rose-300 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-server text-rose-600 dark:text-rose-400"></i> Pagos de Cuentas (Proveedores)
+                                </span>
+                                <span id="notif-provider-count" class="bg-rose-200 dark:bg-rose-800 text-rose-900 dark:text-rose-100 text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
+                            </div>
+                            <div id="notif-provider-list" class="space-y-1.5 max-h-36 overflow-y-auto text-xs pr-1">
+                                <!-- JS Inject -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="bg-emerald-50 dark:bg-slate-800 border border-emerald-200 dark:border-slate-700 p-4 rounded-2xl">
+                        <span class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 block">Ingresos Proyectados</span>
+                        <span id="fin-income" class="text-2xl font-black text-emerald-900 dark:text-emerald-200">L. 0.00</span>
+                        <p class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1">Suma mensual cobrada a clientes</p>
+                    </div>
+                    <div class="bg-rose-50 dark:bg-slate-800 border border-rose-200 dark:border-slate-700 p-4 rounded-2xl">
+                        <span class="text-xs font-semibold text-rose-700 dark:text-rose-400 block">Costos de Plataformas</span>
+                        <span id="fin-expenses" class="text-2xl font-black text-rose-900 dark:text-rose-200">L. 0.00</span>
+                        <p class="text-[10px] text-rose-600 dark:text-rose-400 mt-1">Suma de costos a pagar</p>
+                    </div>
+                    <div class="bg-sky-50 dark:bg-slate-800 border border-sky-200 dark:border-slate-700 p-4 rounded-2xl">
+                        <span class="text-xs font-semibold text-sky-700 dark:text-sky-400 block">Ganancia Neta Estimada</span>
+                        <span id="fin-profit" class="text-2xl font-black text-sky-900 dark:text-sky-200">L. 0.00</span>
+                        <p class="text-[10px] text-sky-600 dark:text-sky-400 mt-1">Rentabilidad JC Streaming</p>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">Cuentas Registradas por Pagar a Proveedor</h3>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Estado de Vencimiento</span>
+                    </div>
+                    <div id="provider-payments-list" class="divide-y divide-slate-100 dark:divide-slate-700">
+                    </div>
+                </div>
+            </section>
+
+            <!-- MÓDULO 4: INFORME MENSUAL -->
+            <section id="mod-4" class="tab-content hidden space-y-5">
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-indigo-600 dark:text-indigo-400"></i> Módulo 4: Informe Mensual del Negocio
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Resumen detallado de perfiles vendidos, ingresos, egresos, estado de cuentas y saldo neto.</p>
+                </div>
+
+                <!-- RESUMEN PRINCIPAL DE GANANCIA / PÉRDIDA -->
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                    <div class="bg-sky-50 dark:bg-slate-800 border border-sky-100 dark:border-slate-700 p-4 rounded-2xl text-center">
+                        <span class="block text-xs font-bold text-sky-700 dark:text-sky-400">Perfiles Vendidos</span>
+                        <span id="rep-sold-profiles" class="text-2xl font-black text-sky-900 dark:text-sky-200">0</span>
+                    </div>
+                    <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 p-4 rounded-2xl text-center">
+                        <span class="block text-xs font-bold text-indigo-700 dark:text-indigo-400">A Recaudar (Esperado)</span>
+                        <span id="rep-total-expected" class="text-2xl font-black text-indigo-900 dark:text-indigo-200">L. 0.00</span>
+                    </div>
+                    <div class="bg-emerald-50 dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 p-4 rounded-2xl text-center">
+                        <span class="block text-xs font-bold text-emerald-700 dark:text-emerald-400">Recaudado (Pagados)</span>
+                        <span id="rep-total-collected" class="text-2xl font-black text-emerald-900 dark:text-emerald-200">L. 0.00</span>
+                    </div>
+                    <div class="bg-rose-50 dark:bg-slate-800 border border-rose-100 dark:border-slate-700 p-4 rounded-2xl text-center">
+                        <span class="block text-xs font-bold text-rose-700 dark:text-rose-400">Pago Total a Proveedores</span>
+                        <span id="rep-total-providers" class="text-2xl font-black text-rose-900 dark:text-rose-200">L. 0.00</span>
+                    </div>
+                    <div id="rep-balance-card" class="bg-purple-50 dark:bg-slate-800 border border-purple-100 dark:border-slate-700 p-4 rounded-2xl text-center">
+                        <span id="rep-balance-title" class="block text-xs font-bold text-purple-700 dark:text-purple-400">Ganancia Real</span>
+                        <span id="rep-balance-amount" class="text-2xl font-black text-purple-900 dark:text-purple-200">L. 0.00</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- DETALLE DE CUENTAS POR PROVEEDOR Y SUS COSTOS -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 space-y-3">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-2">
+                            <i class="fa-solid fa-receipt text-rose-500"></i> Cuánto se Pagó por Cada Cuenta
+                        </h3>
+                        <div id="rep-accounts-cost-list" class="divide-y divide-slate-100 dark:divide-slate-700 text-xs max-h-60 overflow-y-auto">
+                            <!-- JS Inject -->
+                        </div>
+                    </div>
+
+                    <!-- CUENTAS CON ESPACIOS VACÍOS PARA CANCELAR O MOVER CLIENTES -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 space-y-3">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-2">
+                            <i class="fa-solid fa-arrows-split-up-and-left text-amber-500"></i> Espacios Libres (Mover / Cancelar)
+                        </h3>
+                        <div id="rep-empty-accounts-list" class="divide-y divide-slate-100 dark:divide-slate-700 text-xs max-h-60 overflow-y-auto">
+                            <!-- JS Inject -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLIENTES QUE NO PAGARON PARA QUITAR ACCESO -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-user-xmark text-rose-600"></i> Clientes Sin Pago (Quitar Acceso)
+                        </h3>
+                        <span id="rep-unpaid-count" class="bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-300 text-xs font-bold px-2.5 py-0.5 rounded-full">0 morosos</span>
+                    </div>
+                    <div id="rep-unpaid-clients-list" class="space-y-2 text-xs">
+                        <!-- JS Inject -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 px-3 py-2 flex items-center justify-around z-30 shadow-lg">
+            <button onclick="window.switchTab('mod-1')" id="mob-nav-mod-1" class="mob-tab-btn flex flex-col items-center gap-1 text-sky-600 dark:text-sky-400 text-[11px] font-bold">
+                <i class="fa-solid fa-tv text-lg"></i>
+                <span>Plataformas</span>
+            </button>
+            <button onclick="window.switchTab('mod-2')" id="mob-nav-mod-2" class="mob-tab-btn flex flex-col items-center gap-1 text-slate-400 text-[11px] font-bold relative">
+                <i class="fa-solid fa-hand-holding-dollar text-lg"></i>
+                <span>Cobros</span>
+                <span id="mob-badge-cobros" class="hidden absolute -top-1 right-2 bg-rose-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">0</span>
+            </button>
+            <button onclick="window.switchTab('mod-3')" id="mob-nav-mod-3" class="mob-tab-btn flex flex-col items-center gap-1 text-slate-400 text-[11px] font-bold">
+                <i class="fa-solid fa-file-invoice-dollar text-lg"></i>
+                <span>Mis Pagos</span>
+            </button>
+            <button onclick="window.switchTab('mod-4')" id="mob-nav-mod-4" class="mob-tab-btn flex flex-col items-center gap-1 text-slate-400 text-[11px] font-bold">
+                <i class="fa-solid fa-chart-pie text-lg"></i>
+                <span>Informe</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- MODAL: PLATFORM DETAILS -->
+    <div id="modal-platform-detail" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700 my-auto">
+            <div id="platform-detail-header" class="p-4 text-white flex items-center justify-between bg-slate-900">
+                <div class="flex items-center gap-3">
+                    <div id="detail-platform-logo-box" class="w-10 h-10 rounded-xl bg-white/10 p-1 flex items-center justify-center text-xl font-bold">
+                        <i id="detail-platform-icon-preview" class="fa-solid fa-tv"></i>
+                    </div>
+                    <div>
+                        <h3 id="detail-platform-name" class="font-extrabold text-base leading-tight">Nombre Plataforma</h3>
+                        <p class="text-xs text-slate-300">Gestión de precios y cuentas</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.deletePlatform()" title="Eliminar Plataforma" class="w-8 h-8 rounded-full bg-rose-600/80 hover:bg-rose-600 text-white flex items-center justify-center text-xs transition">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                    <button onclick="window.closeModal('modal-platform-detail')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 overflow-y-auto flex-grow space-y-4 bg-slate-50 dark:bg-slate-900">
+                <div class="bg-amber-50 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 p-3 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="text-xs space-y-0.5">
+                        <span class="font-bold text-amber-900 dark:text-amber-400 flex items-center gap-1"><i class="fa-solid fa-pen-to-square"></i> Editar Ícono y Precios (L.):</span>
+                        <p class="text-[11px] text-amber-700 dark:text-amber-300">Modifica la clase de Font Awesome y los valores de cobro/costo.</p>
+                    </div>
+                    <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">Ícono:</span>
+                            <input type="text" id="edit-plat-icon" placeholder="fa-tv" class="w-24 px-2 py-1 bg-white dark:bg-slate-700 border border-amber-300 dark:border-slate-600 rounded-lg text-xs font-bold text-slate-900 dark:text-white">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">Perfil L.:</span>
+                            <input type="number" step="0.01" id="edit-plat-profile-price" class="w-16 px-2 py-1 bg-white dark:bg-slate-700 border border-amber-300 dark:border-slate-600 rounded-lg text-xs font-bold text-slate-900 dark:text-white">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">Cuenta L.:</span>
+                            <input type="number" step="0.01" id="edit-plat-account-cost" class="w-16 px-2 py-1 bg-white dark:bg-slate-700 border border-amber-300 dark:border-slate-600 rounded-lg text-xs font-bold text-slate-900 dark:text-white">
+                        </div>
+                        <button onclick="window.savePlatformPriceChanges()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow transition">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between gap-2 bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700">
+                    <div class="text-xs text-slate-600 dark:text-slate-400">
+                        <span class="font-bold">Cuentas creadas:</span> <span id="detail-accounts-count">0</span> / 15
+                    </div>
+                    <button id="btn-add-account" onclick="window.addNewAccountToPlatform()" class="px-3 py-1.5 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-plus text-xs"></i> Agregar Cuenta
+                    </button>
+                </div>
+
+                <div id="accounts-container" class="space-y-4">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT CLIENT PROFILE -->
+    <div id="modal-client-form" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-md w-full p-5 border border-slate-200 dark:border-slate-700 my-auto space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+                <div>
+                    <h3 id="client-form-title" class="font-bold text-base text-slate-900 dark:text-white">Asignar / Editar Cliente</h3>
+                    <p id="client-form-subtitle" class="text-xs text-slate-500 dark:text-slate-400">Configura cliente y precio personalizado</p>
+                </div>
+                <button onclick="window.closeModal('modal-client-form')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="client-form" onsubmit="window.saveClientForm(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="cf-platform-id">
+                <input type="hidden" id="cf-account-id">
+                <input type="hidden" id="cf-profile-index">
+
+                <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Nombre Completo del Cliente *</label>
+                    <input type="text" id="cf-name" required placeholder="Ej: Juan Pérez" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+                </div>
+
+                <div class="space-y-2 border-t border-slate-100 dark:border-slate-700 pt-2">
+                    <div class="flex items-center justify-between">
+                        <label class="block font-bold text-slate-800 dark:text-slate-200">Plataformas, Perfiles y PINs a Asignar</label>
+                        <button type="button" onclick="window.addPlatformSelectionRow()" class="text-[11px] text-sky-600 dark:text-sky-400 font-bold hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-plus-circle"></i> Agregar perfil / plataforma
+                        </button>
+                    </div>
+                    
+                    <div id="multi-platform-container" class="space-y-2">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Fecha de Ingreso *</label>
+                        <input type="date" id="cf-start-date" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Teléfono / WhatsApp (Opcional)</label>
+                        <input type="text" id="cf-phone" placeholder="Ej: +504 9999-9999" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    </div>
+                </div>
+
+                <div class="bg-sky-50 dark:bg-slate-700/50 border border-sky-200 dark:border-slate-600 p-2.5 rounded-xl space-y-1">
+                    <label class="block font-bold text-sky-900 dark:text-sky-300">Precio Total Mensual a Cobrar (L.) *</label>
+                    <input type="number" step="0.01" id="cf-monthly-price" placeholder="Monto personalizable" required class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-sky-300 dark:border-slate-600 rounded-xl font-extrabold text-sky-700 dark:text-sky-400 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                </div>
+
+                <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+                    <button type="button" onclick="window.deleteClientFromForm()" id="btn-delete-client" class="hidden px-3 py-2 bg-rose-100 dark:bg-rose-900/40 hover:bg-rose-200 text-rose-700 dark:text-rose-300 font-bold rounded-xl transition text-xs">
+                        <i class="fa-solid fa-trash"></i> Liberar Perfil
+                    </button>
+                    <button type="submit" class="flex-grow py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-md transition text-xs flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Cliente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL SELECCIÓN DE PLATAFORMAS A QUITAR -->
+    <div id="modal-delete-client-selection" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-sm w-full p-5 border border-slate-200 dark:border-slate-700 my-auto space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
+                <h3 class="font-bold text-sm text-slate-800 dark:text-slate-200">Seleccionar Plataformas a Quitar</h3>
+                <button onclick="window.closeModal('modal-delete-client-selection')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Marca las plataformas que deseas quitarle a este cliente:</p>
+            <div id="delete-platforms-checkbox-list" class="space-y-2 max-h-48 overflow-y-auto">
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+                <button type="button" onclick="window.closeModal('modal-delete-client-selection')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl">Cancelar</button>
+                <button type="button" onclick="window.confirmDeleteSelectedPlatforms()" class="px-3 py-1.5 bg-rose-600 text-white text-xs font-bold rounded-xl shadow hover:bg-rose-700">Confirmar Eliminación</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDITAR INFORMACIÓN COMPLETA DESDE MÓDULO DE COBROS -->
+    <div id="modal-edit-client-cobro" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-lg w-full p-5 border border-slate-200 dark:border-slate-700 my-auto space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+                <div>
+                    <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-user-pen text-sky-600 dark:text-sky-400"></i> Información del Cliente
+                    </h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Consulta y edita datos, plataformas, PINs y fechas</p>
+                </div>
+                <button onclick="window.closeModal('modal-edit-client-cobro')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="window.saveClientFromCobroModal(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="ecm-original-name">
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Nombre del Cliente *</label>
+                        <input type="text" id="ecm-name" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-bold text-slate-800 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Teléfono / WhatsApp</label>
+                        <input type="text" id="ecm-phone" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-medium text-slate-800 dark:text-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Fecha de Pago / Ingreso (Afecta todas las plataformas)</label>
+                    <input type="date" id="ecm-start-date" required onchange="window.updateCobroModalNextDueDateDisplay(this.value)" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-bold text-sky-700 dark:text-sky-400">
+                    <p class="text-[10px] text-slate-400 mt-1">Próxima fecha límite de cobro: <strong id="ecm-next-due-preview" class="text-emerald-600 dark:text-emerald-400 font-bold">---</strong></p>
+                </div>
+
+                <div class="space-y-2 border-t border-slate-100 dark:border-slate-700 pt-3">
+                    <label class="block font-bold text-slate-800 dark:text-slate-200">Plataformas Asignadas, Cuentas, Nombres de Perfil y PINs</label>
+                    <div id="ecm-platforms-list" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+                    <button type="button" onclick="window.closeModal('modal-edit-client-cobro')" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-xl transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD NEW PLATFORM -->
+    <div id="modal-add-platform" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-sm w-full p-5 border border-slate-200 dark:border-slate-700 my-auto space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
+                <h3 class="font-bold text-base text-slate-900 dark:text-white">Agregar Nueva Plataforma</h3>
+                <button onclick="window.closeModal('modal-add-platform')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="window.saveNewPlatform(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Nombre de la Plataforma *</label>
+                    <input type="text" id="np-name" required placeholder="Ej: Apple TV+" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-medium text-slate-800 dark:text-white">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Ícono FontAwesome *</label>
+                    <input type="text" id="np-icon" value="fa-tv" placeholder="Ej: fa-film, fa-tv, fa-music" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-medium text-slate-800 dark:text-white">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Precio Perfil (L.)</label>
+                        <input type="number" step="0.01" id="np-profile-price" value="110.00" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-medium text-slate-800 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Costo Cuenta (L.)</label>
+                        <input type="number" step="0.01" id="np-account-cost" value="250.00" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-medium text-slate-800 dark:text-white">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-md transition text-xs mt-2">
+                    Crear Plataforma
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: RECEIPT -->
+    <div id="modal-receipt" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-sm w-full p-5 border border-slate-200 dark:border-slate-700 my-auto space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
+                <h3 class="font-bold text-sm text-slate-800 dark:text-slate-200">Recibo Digital de Pago</h3>
+                <button onclick="window.closeModal('modal-receipt')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div id="printable-receipt" class="bg-amber-50/50 dark:bg-slate-900/50 border border-dashed border-amber-300 dark:border-amber-700/50 p-5 rounded-2xl text-slate-800 dark:text-slate-200 font-mono text-xs space-y-3 relative shadow-inner">
+                <div class="text-center space-y-1 pb-3 border-b border-dashed border-amber-300 dark:border-amber-700/50">
+                    <div class="w-12 h-12 mx-auto rounded-xl bg-amber-500 text-slate-900 p-1 border border-amber-400 flex items-center justify-center font-black text-2xl shadow">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
+                    <h2 class="font-black text-base text-slate-900 dark:text-white font-sans tracking-tight">JC Streaming</h2>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 font-sans">Comprobante de Servicio Digital</p>
+                    <p id="rec-id" class="text-[9px] text-slate-400 font-mono">REC-0000</p>
+                </div>
+
+                <div class="space-y-1 text-[11px]">
+                    <p><span class="text-slate-500 dark:text-slate-400">Cliente:</span> <strong id="rec-client-name" class="font-bold text-slate-900 dark:text-white">Juan Pérez</strong></p>
+                    <p><span class="text-slate-500 dark:text-slate-400">Fecha Emisión:</span> <span id="rec-date">00/00/0000</span></p>
+                    <p><span class="text-slate-500 dark:text-slate-400">Próximo Pago:</span> <span id="rec-next-date" class="font-bold text-emerald-700 dark:text-emerald-400">00/00/0000</span></p>
+                </div>
+
+                <div class="py-2 border-y border-dashed border-amber-300 dark:border-amber-700/50 space-y-2">
+                    <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Detalle de Perfiles Pagados:</span>
+                    <div id="rec-profiles-list" class="space-y-1">
+                        <!-- JS Inject -->
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center text-sm font-bold pt-1">
+                    <span>Monto Total Cobrado:</span>
+                    <span id="rec-amount" class="text-emerald-700 dark:text-emerald-400">L. 0.00</span>
+                </div>
+            </div>
+
+            <button onclick="window.print()" class="w-full py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition">
+                <i class="fa-solid fa-print"></i> Imprimir Recibo
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Dark Mode Logic
+        window.toggleDarkMode = function() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('jc_theme', isDark ? 'dark' : 'light');
+            window.updateThemeIcon(isDark);
+        };
+
+        window.updateThemeIcon = function(isDark) {
+            const icon = document.getElementById('theme-toggle-icon');
+            if (icon) {
+                icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            }
+        };
+
+        const savedTheme = localStorage.getItem('jc_theme');
+        if (savedTheme === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+
+        // System Initial Data
+        const DEFAULT_USERS = [
+            { id: 'u1', name: 'Josué Maldonado', role: 'Administrador', pass: '1234' },
+            { id: 'u2', name: 'Operador Principal', role: 'Operador', pass: '1234' }
+        ];
+
+        const DEFAULT_PLATFORMS = [
+            { id: 'p1', name: 'Netflix', icon: 'fa-tv', color: 'bg-red-600', profilePrice: 110, accountCost: 250, maxProfiles: 5, accounts: [] },
+            { id: 'p2', name: 'Disney+', icon: 'fa-wand-magic-sparkles', color: 'bg-blue-600', profilePrice: 90, accountCost: 200, maxProfiles: 4, accounts: [] },
+            { id: 'p3', name: 'HBO Max', icon: 'fa-film', color: 'bg-purple-700', profilePrice: 85, accountCost: 180, maxProfiles: 5, accounts: [] },
+            { id: 'p4', name: 'Spotify', icon: 'fa-music', color: 'bg-emerald-500', profilePrice: 60, accountCost: 150, maxProfiles: 6, accounts: [] }
+        ];
+
+        window.users = JSON.parse(localStorage.getItem('jc_users')) || DEFAULT_USERS;
+        window.platforms = JSON.parse(localStorage.getItem('jc_platforms')) || DEFAULT_PLATFORMS;
+        window.lastResetMonth = localStorage.getItem('jc_last_reset_month') || '';
+        window.currentUser = null;
+        window.activeTab = 'mod-1';
+        window.cobrosFilter = 'all';
+        window.currentEditingPlatformId = null;
+
+        // Auto Month Reset Function
+        window.checkMonthlyReset = function() {
+            const now = new Date();
+            const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            if (!window.lastResetMonth) {
+                window.lastResetMonth = currentMonthStr;
+                localStorage.setItem('jc_last_reset_month', currentMonthStr);
+            } else if (window.lastResetMonth !== currentMonthStr) {
+                window.platforms.forEach(p => {
+                    if (p.accounts) {
+                        p.accounts.forEach(acc => {
+                            if (acc.profiles) {
+                                acc.profiles.forEach(prof => {
+                                    if (prof.clientName) {
+                                        prof.paid = false;
+                                        prof.statusOverride = 'expired';
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+                window.lastResetMonth = currentMonthStr;
+                localStorage.setItem('jc_last_reset_month', currentMonthStr);
+                window.saveData();
+            }
+        };
+
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDX_bxd6ztU3Gbljj4CcnALsQDt_1VKRsg",
+            authDomain: "jc-streaming.firebaseapp.com",
+            databaseURL: "https://jc-streaming-default-rtdb.firebaseio.com",
+            projectId: "jc-streaming",
+            storageBucket: "jc-streaming.firebasestorage.app",
+            messagingSenderId: "187049749991",
+            appId: "1:187049749991:web:f2693931953ff58c036142"
+        };
+
+        let db = null;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getDatabase(app);
+
+            const dbRef = ref(db);
+            
+            get(child(dbRef, 'jc_streaming_data')).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    if (data.users) window.users = data.users;
+                    if (data.platforms) window.platforms = data.platforms;
+                    if (data.lastResetMonth) window.lastResetMonth = data.lastResetMonth;
+                    localStorage.setItem('jc_users', JSON.stringify(window.users));
+                    localStorage.setItem('jc_platforms', JSON.stringify(window.platforms));
+                    if (window.lastResetMonth) localStorage.setItem('jc_last_reset_month', window.lastResetMonth);
+                    window.checkMonthlyReset();
+                    window.populateUserDropdown();
+                    window.renderApp();
+                } else {
+                    window.checkMonthlyReset();
+                    window.saveData();
+                }
+            }).catch((error) => {
+                console.error("Error cargando desde Firebase:", error);
+            });
+
+            onValue(ref(db, 'jc_streaming_data'), (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.users) window.users = data.users;
+                    if (data.platforms) window.platforms = data.platforms;
+                    if (data.lastResetMonth) window.lastResetMonth = data.lastResetMonth;
+                    localStorage.setItem('jc_users', JSON.stringify(window.users));
+                    localStorage.setItem('jc_platforms', JSON.stringify(window.platforms));
+                    if (window.lastResetMonth) localStorage.setItem('jc_last_reset_month', window.lastResetMonth);
+                    window.checkMonthlyReset();
+                    window.populateUserDropdown();
+                    window.renderApp();
+                }
+            });
+        } catch (e) {
+            console.log("Error al conectar con Firebase. Usando almacenamiento local.");
+            window.checkMonthlyReset();
+        }
+
+        window.saveData = function() {
+            localStorage.setItem('jc_users', JSON.stringify(window.users));
+            localStorage.setItem('jc_platforms', JSON.stringify(window.platforms));
+            if (window.lastResetMonth) localStorage.setItem('jc_last_reset_month', window.lastResetMonth);
+
+            if (db) {
+                set(ref(db, 'jc_streaming_data'), {
+                    users: window.users,
+                    platforms: window.platforms,
+                    lastResetMonth: window.lastResetMonth
+                }).catch(err => console.error("Error al guardar en Firebase:", err));
+            }
+        };
+
+        window.populateUserDropdown = function() {
+            const select = document.getElementById('login-user-select');
+            if (!select) return;
+            select.innerHTML = '<option value="" disabled selected>-- Seleccionar usuario --</option>' + window.users.map(u => `<option value="${u.id}">${u.name} (${u.role})</option>`).join('');
+        };
+
+        window.toggleUserManageView = function() {
+            const panel = document.getElementById('user-manage-panel');
+            panel.classList.toggle('hidden');
+        };
+
+        window.handleLogin = function(e) {
+            e.preventDefault();
+            const userId = document.getElementById('login-user-select').value;
+            const pass = document.getElementById('login-pass').value;
+            const user = window.users.find(u => u.id === userId);
+
+            if (user && user.pass === pass) {
+                window.currentUser = user;
+                document.getElementById('active-user-display').innerText = `Usuario: ${user.name}`;
+                document.getElementById('login-modal').classList.add('hidden');
+            } else {
+                alert('Usuario o contraseña incorrectos');
+            }
+        };
+
+        window.logout = function() {
+            window.currentUser = null;
+            document.getElementById('login-pass').value = '';
+            document.getElementById('login-user-select').value = '';
+            document.getElementById('login-modal').classList.remove('hidden');
+        };
+
+        window.addUserSystem = function() {
+            const name = document.getElementById('um-name').value.trim();
+            const role = document.getElementById('um-role').value;
+            const pass = document.getElementById('um-pass').value.trim();
+
+            if (!name || !pass) {
+                alert('Por favor complete los campos requeridos');
+                return;
+            }
+
+            const newUser = { id: 'u_' + Date.now(), name, role, pass };
+            window.users.push(newUser);
+            window.saveData();
+            window.populateUserDropdown();
+            document.getElementById('um-name').value = '';
+            document.getElementById('um-pass').value = '';
+            alert('Usuario guardado exitosamente');
+        };
+
+        window.deleteSelectedUser = function() {
+            const userId = document.getElementById('login-user-select').value;
+            if (window.users.length <= 1) {
+                alert('Debe existir al menos un usuario en el sistema');
+                return;
+            }
+            window.users = window.users.filter(u => u.id !== userId);
+            window.saveData();
+            window.populateUserDropdown();
+            alert('Usuario eliminado');
+        };
+
+        window.switchTab = function(tabId) {
+            window.activeTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn, .mob-tab-btn').forEach(btn => {
+                btn.classList.remove('text-sky-600', 'bg-sky-50', 'dark:bg-slate-700', 'dark:text-sky-400');
+                btn.classList.add('text-slate-400');
+            });
+
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            const mobNav = document.getElementById(`mob-nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('text-sky-600', 'bg-sky-50', 'dark:bg-slate-700', 'dark:text-sky-400');
+                activeNav.classList.remove('text-slate-400');
+            }
+            if (mobNav) {
+                mobNav.classList.add('text-sky-600', 'dark:text-sky-400');
+                mobNav.classList.remove('text-slate-400');
+            }
+
+            window.renderApp();
+        };
+
+        window.renderApp = function() {
+            window.checkMonthlyReset();
+            window.renderNotificationPanel();
+            window.renderModule1();
+            window.renderModule2();
+            window.renderModule3();
+            window.renderModule4();
+        };
+
+        window.closeModal = function(modalId) {
+            const el = document.getElementById(modalId);
+            if (el) el.classList.add('hidden');
+        };
+
+        window.renderNotificationPanel = function() {
+            const clientContainer = document.getElementById('notif-client-list');
+            const providerContainer = document.getElementById('notif-provider-list');
+            const clientCountBadge = document.getElementById('notif-client-count');
+            const providerCountBadge = document.getElementById('notif-provider-count');
+
+            let clientNotifications = [];
+            let providerNotifications = [];
+
+            let clientsMap = {};
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            acc.profiles.forEach(prof => {
+                                if (prof.clientName) {
+                                    if (!clientsMap[prof.clientName]) {
+                                        clientsMap[prof.clientName] = {
+                                            name: prof.clientName,
+                                            startDate: prof.startDate,
+                                            platforms: []
+                                        };
+                                    }
+                                    clientsMap[prof.clientName].platforms.push(p.name);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            Object.values(clientsMap).forEach(c => {
+                const nextDue = window.getNextDueDate(c.startDate);
+                const daysLeft = window.calculateDaysDiff(nextDue);
+
+                if (daysLeft <= 3) {
+                    clientNotifications.push({
+                        name: c.name,
+                        daysLeft: daysLeft,
+                        dueDate: nextDue ? nextDue.toLocaleDateString() : 'N/A',
+                        platforms: c.platforms.join(', ')
+                    });
+                }
+            });
+
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.dueDate) {
+                            const dueDateObj = new Date(acc.dueDate + 'T00:00:00');
+                            const daysLeft = window.calculateDaysDiff(dueDateObj);
+
+                            if (daysLeft <= 3) {
+                                providerNotifications.push({
+                                    platform: p.name,
+                                    email: acc.email,
+                                    cost: p.accountCost || 0,
+                                    daysLeft: daysLeft,
+                                    dueDate: dueDateObj.toLocaleDateString()
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            clientCountBadge.innerText = clientNotifications.length;
+            if (clientNotifications.length === 0) {
+                clientContainer.innerHTML = `<p class="text-slate-400 text-[11px] italic">Sin cobros pendientes por vencer.</p>`;
+            } else {
+                clientContainer.innerHTML = clientNotifications.map(c => `
+                    <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded-lg border border-amber-200 dark:border-slate-700">
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200 font-bold block">${c.name}</strong>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400">${c.platforms}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="${c.daysLeft <= 0 ? 'text-rose-600 dark:text-rose-400 font-extrabold' : 'text-amber-700 dark:text-amber-400 font-bold'}">
+                                ${c.daysLeft <= 0 ? '¡Vencido!' : 'Vence en ' + c.daysLeft + ' día(s)'}
+                            </span>
+                            <span class="block text-[9px] text-slate-400">${c.dueDate}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            providerCountBadge.innerText = providerNotifications.length;
+            if (providerNotifications.length === 0) {
+                providerContainer.innerHTML = `<p class="text-slate-400 text-[11px] italic">Sin pagos a proveedor próximos.</p>`;
+            } else {
+                providerContainer.innerHTML = providerNotifications.map(p => `
+                    <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded-lg border border-rose-200 dark:border-slate-700">
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200 font-bold block">${p.platform} (${p.email})</strong>
+                            <span class="text-[10px] text-rose-600 dark:text-rose-400 font-semibold">Costo: L. ${p.cost.toFixed(2)}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="${p.daysLeft <= 0 ? 'text-rose-700 dark:text-rose-400 font-black' : 'text-amber-700 dark:text-amber-400 font-bold'}">
+                                ${p.daysLeft <= 0 ? '¡Pagar Hoy!' : 'Pagar en ' + p.daysLeft + ' día(s)'}
+                            </span>
+                            <span class="block text-[9px] text-slate-400">${p.dueDate}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        };
+
+        window.renderModule1 = function() {
+            const grid = document.getElementById('platforms-grid');
+            let totalAccounts = 0;
+            let occupiedProfiles = 0;
+            let freeProfiles = 0;
+
+            grid.innerHTML = window.platforms.map(p => {
+                let pAccounts = p.accounts ? p.accounts.length : 0;
+                let pOccupied = 0;
+                let pTotalProfiles = pAccounts * (p.maxProfiles || 5);
+
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            pOccupied += acc.profiles.filter(prof => prof.clientName).length;
+                        }
+                    });
+                }
+
+                totalAccounts += pAccounts;
+                occupiedProfiles += pOccupied;
+                freeProfiles += (pTotalProfiles - pOccupied);
+
+                return `
+                    <div onclick="window.openPlatformDetail('${p.id}')" class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md cursor-pointer transition flex flex-col justify-between">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 ${p.color || 'bg-slate-800'} text-white rounded-xl flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid ${p.icon || 'fa-tv'}"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-900 dark:text-white">${p.name}</h3>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">L. ${p.profilePrice}/perfil</p>
+                            </div>
+                        </div>
+                        <div class="text-[11px] space-y-1 border-t border-slate-100 dark:border-slate-700 pt-2">
+                            <div class="flex justify-between text-slate-600 dark:text-slate-400">
+                                <span>Cuentas:</span>
+                                <strong class="text-slate-800 dark:text-slate-200">${pAccounts}</strong>
+                            </div>
+                            <div class="flex justify-between text-slate-600 dark:text-slate-400">
+                                <span>Perfiles Ocupados:</span>
+                                <strong class="text-emerald-600 dark:text-emerald-400">${pOccupied} / ${pTotalProfiles}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('stat-total-platforms').innerText = window.platforms.length;
+            document.getElementById('stat-total-accounts').innerText = totalAccounts;
+            document.getElementById('stat-occupied-profiles').innerText = occupiedProfiles;
+            document.getElementById('stat-free-profiles').innerText = freeProfiles;
+        };
+
+        window.openPlatformDetail = function(platformId) {
+            window.currentEditingPlatformId = platformId;
+            const platform = window.platforms.find(p => p.id === platformId);
+            if (!platform) return;
+
+            document.getElementById('detail-platform-name').innerText = platform.name;
+            document.getElementById('edit-plat-icon').value = platform.icon || 'fa-tv';
+            document.getElementById('edit-plat-profile-price').value = platform.profilePrice;
+            document.getElementById('edit-plat-account-cost').value = platform.accountCost;
+            document.getElementById('detail-accounts-count').innerText = platform.accounts ? platform.accounts.length : 0;
+
+            const iconPreview = document.getElementById('detail-platform-icon-preview');
+            iconPreview.className = `fa-solid ${platform.icon || 'fa-tv'}`;
+
+            window.renderPlatformAccounts(platform);
+            document.getElementById('modal-platform-detail').classList.remove('hidden');
+        };
+
+        window.deletePlatform = function() {
+            if (!window.currentEditingPlatformId) return;
+            const platform = window.platforms.find(p => p.id === window.currentEditingPlatformId);
+            if (!platform) return;
+
+            if (confirm(`¿Estás seguro de eliminar la plataforma "${platform.name}" y todas sus cuentas asociadas?`)) {
+                window.platforms = window.platforms.filter(p => p.id !== window.currentEditingPlatformId);
+                window.saveData();
+                window.closeModal('modal-platform-detail');
+                window.renderApp();
+            }
+        };
+
+        window.renderPlatformAccounts = function(platform) {
+            const container = document.getElementById('accounts-container');
+            if (!platform.accounts || platform.accounts.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No hay cuentas registradas en esta plataforma.</p>`;
+                return;
+            }
+
+            container.innerHTML = platform.accounts.map((acc) => `
+                <div class="bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2 gap-2">
+                        <div>
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">${acc.email}</span>
+                            <p class="text-[10px] text-slate-400">Clave: ${acc.pass || 'Sin Clave'}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-1">
+                                <label class="text-[10px] font-bold text-slate-600 dark:text-slate-400">F. Pago Proveedor:</label>
+                                <input type="date" value="${acc.dueDate || ''}" onchange="window.updateAccountDueDate('${platform.id}', '${acc.id}', this.value)" class="px-2 py-0.5 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-white rounded text-[10px] font-bold">
+                            </div>
+                            <button onclick="window.deleteAccount('${platform.id}', '${acc.id}')" class="text-rose-500 hover:text-rose-700 text-xs p-1">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        ${acc.profiles.map((prof, pIdx) => `
+                            <button onclick="window.openClientForm('${platform.id}', '${acc.id}', ${pIdx})" class="p-2 rounded-xl text-left border ${prof.clientName ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800' : 'bg-slate-50 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 hover:border-slate-300'} transition">
+                                <span class="text-[10px] font-bold block ${prof.clientName ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}">Perfil ${pIdx + 1} ${prof.profileName ? '(' + prof.profileName + ')' : ''}</span>
+                                <span class="text-xs font-semibold truncate block text-slate-800 dark:text-slate-200">${prof.clientName || 'Disponible'}</span>
+                                ${prof.pin ? `<span class="text-[9px] text-slate-400 block font-mono">PIN: ${prof.pin}</span>` : ''}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.updateAccountDueDate = function(platformId, accountId, newDate) {
+            const platform = window.platforms.find(p => p.id === platformId);
+            if (!platform) return;
+            const account = platform.accounts.find(a => a.id === accountId);
+            if (account) {
+                account.dueDate = newDate;
+                window.saveData();
+                window.renderApp();
+            }
+        };
+
+        window.addNewAccountToPlatform = function() {
+            const platform = window.platforms.find(p => p.id === window.currentEditingPlatformId);
+            if (!platform) return;
+
+            const email = prompt("Ingrese el correo o nombre de la nueva cuenta:");
+            if (!email) return;
+            const pass = prompt("Ingrese la contraseña de la cuenta:") || '';
+            const dueDate = prompt("Ingrese la fecha límite de pago al proveedor (YYYY-MM-DD):", new Date().toISOString().split('T')[0]) || '';
+
+            const newAcc = {
+                id: 'acc_' + Date.now(),
+                email,
+                pass,
+                dueDate,
+                profiles: Array.from({ length: platform.maxProfiles || 5 }, () => ({ clientName: '', profileName: '', phone: '', pin: '', startDate: '', monthlyPrice: platform.profilePrice, paid: false }))
+            };
+
+            if (!platform.accounts) platform.accounts = [];
+            platform.accounts.push(newAcc);
+            window.saveData();
+            window.openPlatformDetail(platform.id);
+            window.renderApp();
+        };
+
+        window.deleteAccount = function(platformId, accountId) {
+            if (!confirm("¿Está seguro de eliminar esta cuenta y sus perfiles asociados?")) return;
+            const platform = window.platforms.find(p => p.id === platformId);
+            if (!platform) return;
+
+            platform.accounts = platform.accounts.filter(a => a.id !== accountId);
+            window.saveData();
+            window.openPlatformDetail(platform.id);
+            window.renderApp();
+        };
+
+        window.savePlatformPriceChanges = function() {
+            const platform = window.platforms.find(p => p.id === window.currentEditingPlatformId);
+            if (!platform) return;
+
+            const newIcon = document.getElementById('edit-plat-icon').value.trim();
+            platform.icon = newIcon || 'fa-tv';
+            platform.profilePrice = parseFloat(document.getElementById('edit-plat-profile-price').value) || 0;
+            platform.accountCost = parseFloat(document.getElementById('edit-plat-account-cost').value) || 0;
+
+            window.saveData();
+            alert('Datos de la plataforma actualizados');
+            window.openPlatformDetail(platform.id);
+            window.renderApp();
+        };
+
+        window.openQuickAddClient = function() {
+            document.getElementById('cf-platform-id').value = '';
+            document.getElementById('cf-account-id').value = '';
+            document.getElementById('cf-profile-index').value = '';
+
+            document.getElementById('client-form').reset();
+            
+            const firstPlat = window.platforms.length > 0 ? window.platforms[0] : null;
+            document.getElementById('cf-monthly-price').value = firstPlat ? firstPlat.profilePrice : '';
+            document.getElementById('cf-start-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('btn-delete-client').classList.add('hidden');
+
+            const defaultPlatId = firstPlat ? firstPlat.id : '';
+            const defaultAccId = (firstPlat && firstPlat.accounts && firstPlat.accounts.length > 0) ? firstPlat.accounts[0].id : '';
+
+            window.renderMultiPlatformSelection([{ platformId: defaultPlatId, accountId: defaultAccId, profileIdx: 0, profileName: '', pin: '' }]);
+            document.getElementById('modal-client-form').classList.remove('hidden');
+        };
+
+        window.openClientForm = function(platformId, accountId, profileIndex) {
+            document.getElementById('cf-platform-id').value = platformId;
+            document.getElementById('cf-account-id').value = accountId;
+            document.getElementById('cf-profile-index').value = profileIndex;
+
+            const platform = window.platforms.find(p => p.id === platformId);
+            const account = platform ? platform.accounts.find(a => a.id === accountId) : null;
+            const profile = account ? account.profiles[profileIndex] : null;
+
+            if (profile && profile.clientName) {
+                document.getElementById('cf-name').value = profile.clientName;
+                document.getElementById('cf-start-date').value = profile.startDate || '';
+                document.getElementById('cf-monthly-price').value = profile.monthlyPrice || platform.profilePrice;
+                document.getElementById('cf-phone').value = profile.phone || '';
+                document.getElementById('btn-delete-client').classList.remove('hidden');
+
+                let clientProfiles = [];
+                window.platforms.forEach(p => {
+                    if (p.accounts) {
+                        p.accounts.forEach(acc => {
+                            if (acc.profiles) {
+                                acc.profiles.forEach((prof, pIdx) => {
+                                    if (prof.clientName === profile.clientName) {
+                                        clientProfiles.push({
+                                            platformId: p.id,
+                                            accountId: acc.id,
+                                            profileIdx: pIdx,
+                                            profileName: prof.profileName || '',
+                                            pin: prof.pin || ''
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+                window.renderMultiPlatformSelection(clientProfiles);
+            } else {
+                document.getElementById('client-form').reset();
+                document.getElementById('cf-monthly-price').value = platform ? platform.profilePrice : '';
+                document.getElementById('cf-start-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('btn-delete-client').classList.add('hidden');
+                window.renderMultiPlatformSelection([{ platformId, accountId, profileIdx: profileIndex, profileName: '', pin: '' }]);
+            }
+
+            document.getElementById('modal-client-form').classList.remove('hidden');
+        };
+
+        window.renderMultiPlatformSelection = function(initialItems = []) {
+            const container = document.getElementById('multi-platform-container');
+            container.innerHTML = '';
+            if (initialItems.length === 0) {
+                window.addPlatformSelectionRow();
+            } else {
+                initialItems.forEach(item => {
+                    window.addPlatformSelectionRow(item.platformId, item.accountId, item.profileIdx, item.profileName, item.pin);
+                });
+            }
+        };
+
+        window.addPlatformSelectionRow = function(selectedPlatId = '', selectedAccId = '', selectedProfIdx = 0, selectedProfName = '', selectedPin = '') {
+            const container = document.getElementById('multi-platform-container');
+            const rowId = 'plat_row_' + Date.now() + Math.random().toString(36).substring(2, 5);
+
+            const row = document.createElement('div');
+            row.id = rowId;
+            row.className = "space-y-1.5 bg-slate-50 dark:bg-slate-700/50 p-2.5 rounded-xl border border-slate-200 dark:border-slate-600";
+
+            row.innerHTML = `
+                <div class="grid grid-cols-12 gap-2 items-center">
+                    <div class="col-span-5">
+                        <select onchange="window.onPlatformSelectChange('${rowId}')" class="plat-select w-full px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-800 dark:text-white">
+                            <option value="">Plataforma</option>
+                            ${window.platforms.map(p => `<option value="${p.id}" ${p.id === selectedPlatId ? 'selected' : ''}>${p.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="col-span-6">
+                        <select class="acc-select w-full px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-xs text-slate-800 dark:text-white">
+                            <option value="">Cuenta / Perfil N°</option>
+                        </select>
+                    </div>
+                    <div class="col-span-1 text-right">
+                        <button type="button" onclick="document.getElementById('${rowId}').remove()" class="text-rose-500 hover:text-rose-700 text-xs">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <input type="text" value="${selectedProfName}" placeholder="Nombre de Perfil (ej: Infantil)" class="prof-name-input w-full px-2 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-xs text-slate-800 dark:text-white">
+                    </div>
+                    <div>
+                        <input type="text" value="${selectedPin}" placeholder="PIN (ej: 1234)" class="prof-pin-input w-full px-2 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono text-slate-800 dark:text-white">
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(row);
+
+            if (selectedPlatId) {
+                window.populateAccountOptionsForRow(row, selectedPlatId, selectedAccId, selectedProfIdx);
+            }
+        };
+
+        window.onPlatformSelectChange = function(rowId) {
+            const row = document.getElementById(rowId);
+            const platId = row.querySelector('.plat-select').value;
+            window.populateAccountOptionsForRow(row, platId, '', 0);
+        };
+
+        window.populateAccountOptionsForRow = function(row, platformId, selectedAccId, selectedProfIdx = 0) {
+            const accSelect = row.querySelector('.acc-select');
+            const platform = window.platforms.find(p => p.id === platformId);
+
+            if (!platform || !platform.accounts || platform.accounts.length === 0) {
+                accSelect.innerHTML = `<option value="">Sin cuentas disponibles</option>`;
+                return;
+            }
+
+            let optionsHtml = '';
+            platform.accounts.forEach((acc) => {
+                acc.profiles.forEach((prof, pIdx) => {
+                    const isSelected = (acc.id === selectedAccId && pIdx === selectedProfIdx);
+                    if (!prof.clientName || isSelected) {
+                        optionsHtml += `<option value="${acc.id}:${pIdx}" ${isSelected ? 'selected' : ''}>${acc.email} - Perfil ${pIdx + 1} ${prof.clientName ? '(Actual)' : '(Libre)'}</option>`;
+                    }
+                });
+            });
+
+            accSelect.innerHTML = optionsHtml || `<option value="">Sin perfiles libres</option>`;
+        };
+
+        window.saveClientForm = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('cf-name').value.trim();
+            const startDate = document.getElementById('cf-start-date').value;
+            const monthlyPrice = parseFloat(document.getElementById('cf-monthly-price').value) || 0;
+            const phone = document.getElementById('cf-phone').value.trim();
+
+            const rows = document.querySelectorAll('#multi-platform-container > div');
+            if (rows.length === 0) {
+                alert('Debe seleccionar al menos una plataforma');
+                return;
+            }
+
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            acc.profiles.forEach(prof => {
+                                if (prof.clientName === name) {
+                                    prof.clientName = '';
+                                    prof.profileName = '';
+                                    prof.pin = '';
+                                    prof.phone = '';
+                                    prof.startDate = '';
+                                    prof.paid = false;
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            let savedCount = 0;
+
+            rows.forEach(row => {
+                const platId = row.querySelector('.plat-select').value;
+                const accVal = row.querySelector('.acc-select').value;
+                const profName = row.querySelector('.prof-name-input').value.trim();
+                const pin = row.querySelector('.prof-pin-input').value.trim();
+
+                if (platId && accVal) {
+                    const [accId, pIdxStr] = accVal.split(':');
+                    const pIdx = parseInt(pIdxStr, 10);
+
+                    const platform = window.platforms.find(p => p.id === platId);
+                    if (platform) {
+                        const account = platform.accounts.find(a => a.id === accId);
+                        if (account && account.profiles[pIdx]) {
+                            const profile = account.profiles[pIdx];
+                            profile.clientName = name;
+                            profile.profileName = profName;
+                            profile.pin = pin;
+                            profile.startDate = startDate;
+                            profile.monthlyPrice = monthlyPrice;
+                            profile.phone = phone;
+                            profile.paid = false;
+                            profile.statusOverride = 'expired';
+                            savedCount++;
+                        }
+                    }
+                }
+            });
+
+            if (savedCount > 0) {
+                window.saveData();
+                window.closeModal('modal-client-form');
+                if (window.currentEditingPlatformId) window.openPlatformDetail(window.currentEditingPlatformId);
+                window.renderApp();
+            }
+        };
+
+        window.deleteClientFromForm = function() {
+            const name = document.getElementById('cf-name').value.trim();
+            if (!name) return;
+
+            let clientProfiles = [];
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            acc.profiles.forEach((prof, pIdx) => {
+                                if (prof.clientName === name) {
+                                    clientProfiles.push({
+                                        platformId: p.id,
+                                        platformName: p.name,
+                                        accountId: acc.id,
+                                        accountEmail: acc.email,
+                                        profileIndex: pIdx,
+                                        profileName: prof.profileName || ''
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            if (clientProfiles.length > 1) {
+                const listContainer = document.getElementById('delete-platforms-checkbox-list');
+                listContainer.innerHTML = clientProfiles.map((cp, idx) => `
+                    <label class="flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 cursor-pointer text-xs">
+                        <input type="checkbox" value="${cp.platformId}:${cp.accountId}:${cp.profileIndex}" class="del-plat-check rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                        <span class="font-bold text-slate-800 dark:text-slate-200">${cp.platformName}</span>
+                        <span class="text-[10px] text-slate-400">(${cp.accountEmail} - Perfil ${cp.profileIndex + 1})</span>
+                    </label>
+                `).join('');
+                document.getElementById('modal-delete-client-selection').classList.remove('hidden');
+            } else {
+                if (!confirm("¿Está seguro de liberar este perfil?")) return;
+                const platformId = document.getElementById('cf-platform-id').value;
+                const accountId = document.getElementById('cf-account-id').value;
+                const profileIndex = parseInt(document.getElementById('cf-profile-index').value);
+
+                const platform = window.platforms.find(p => p.id === platformId);
+                if (platform) {
+                    const account = platform.accounts.find(a => a.id === accountId);
+                    if (account && account.profiles[profileIndex]) {
+                        account.profiles[profileIndex] = {
+                            clientName: '',
+                            profileName: '',
+                            phone: '',
+                            pin: '',
+                            startDate: '',
+                            monthlyPrice: platform.profilePrice,
+                            paid: false
+                        };
+                    }
+                }
+
+                window.saveData();
+                window.closeModal('modal-client-form');
+                if (window.currentEditingPlatformId) window.openPlatformDetail(window.currentEditingPlatformId);
+                window.renderApp();
+            }
+        };
+
+        window.confirmDeleteSelectedPlatforms = function() {
+            const checkboxes = document.querySelectorAll('.del-plat-check:checked');
+            if (checkboxes.length === 0) {
+                alert('Selecciona al menos una plataforma para eliminar');
+                return;
+            }
+
+            checkboxes.forEach(cb => {
+                const [platId, accId, profIdxStr] = cb.value.split(':');
+                const profIdx = parseInt(profIdxStr, 10);
+                const platform = window.platforms.find(p => p.id === platId);
+                if (platform) {
+                    const account = platform.accounts.find(a => a.id === accId);
+                    if (account && account.profiles[profIdx]) {
+                        account.profiles[profIdx] = {
+                            clientName: '',
+                            profileName: '',
+                            phone: '',
+                            pin: '',
+                            startDate: '',
+                            monthlyPrice: platform.profilePrice,
+                            paid: false
+                        };
+                    }
+                }
+            });
+
+            window.saveData();
+            window.closeModal('modal-delete-client-selection');
+            window.closeModal('modal-client-form');
+            if (window.currentEditingPlatformId) window.openPlatformDetail(window.currentEditingPlatformId);
+            window.renderApp();
+        };
+
+        window.getNextDueDate = function(startDateStr) {
+            if (!startDateStr) return null;
+            const start = new Date(startDateStr + 'T00:00:00');
+            if (isNaN(start.getTime())) return null;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            let due = new Date(start);
+            due.setMonth(due.getMonth() + 1);
+
+            while (due <= today) {
+                due.setMonth(due.getMonth() + 1);
+            }
+
+            return due;
+        };
+
+        window.calculateDaysDiff = function(dueDate) {
+            if (!dueDate) return 999;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const diffTime = dueDate.getTime() - today.getTime();
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        };
+
+        window.cyclePaymentStatus = function(clientName) {
+            let currentStatus = 'ok';
+            let clientProfiles = [];
+
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            acc.profiles.forEach(prof => {
+                                if (prof.clientName === clientName) {
+                                    clientProfiles.push(prof);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            if (clientProfiles.length === 0) return;
+
+            const firstProf = clientProfiles[0];
+            if (firstProf.statusOverride) {
+                currentStatus = firstProf.statusOverride;
+            } else {
+                const nextDue = window.getNextDueDate(firstProf.startDate);
+                const daysLeft = window.calculateDaysDiff(nextDue);
+                if (daysLeft <= 0) currentStatus = 'expired';
+                else if (daysLeft <= 3) currentStatus = 'due_soon';
+                else currentStatus = 'ok';
+            }
+
+            let nextStatus = 'ok';
+            if (currentStatus === 'ok') nextStatus = 'due_soon';
+            else if (currentStatus === 'due_soon') nextStatus = 'expired';
+            else if (currentStatus === 'expired') {
+                nextStatus = 'ok';
+                window.markAsPaid(clientName);
+                return;
+            }
+
+            clientProfiles.forEach(prof => {
+                prof.statusOverride = nextStatus;
+                prof.paid = (nextStatus === 'ok');
+            });
+
+            window.saveData();
+            window.renderApp();
+        };
+
+        window.markAsPaid = function(clientName) {
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            acc.profiles.forEach(prof => {
+                                if (prof.clientName === clientName) {
+                                    prof.paid = true;
+                                    delete prof.statusOverride;
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            window.saveData();
+            window.renderApp();
+        };
+
+        window.markAsUnpaid = function(clientName) {
+            if (!confirm(`¿Deseas marcar el servicio de ${clientName} como NO PAGADO (Pendiente)?`)) return;
+
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            acc.profiles.forEach(prof => {
+                                if (prof.clientName === clientName) {
+                                    prof.paid = false;
+                                    prof.statusOverride = 'expired';
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            window.saveData();
+            window.renderApp();
+        };
+
+        window.openEditClientFromCobro = function(clientName) {
+            document.getElementById('ecm-original-name').value = clientName;
+            document.getElementById('ecm-name').value = clientName;
+
+            let phone = '';
+            let startDate = '';
+            let items = [];
+
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            acc.profiles.forEach((prof, pIdx) => {
+                                if (prof.clientName === clientName) {
+                                    if (!phone && prof.phone) phone = prof.phone;
+                                    if (!startDate && prof.startDate) startDate = prof.startDate;
+
+                                    items.push({
+                                        platformId: p.id,
+                                        platformName: p.name,
+                                        accountId: acc.id,
+                                        accountEmail: acc.email,
+                                        profileIdx: pIdx,
+                                        profileName: prof.profileName || '',
+                                        pin: prof.pin || '',
+                                        price: prof.monthlyPrice || p.profilePrice || 0
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            document.getElementById('ecm-phone').value = phone;
+            document.getElementById('ecm-start-date').value = startDate || new Date().toISOString().split('T')[0];
+            window.updateCobroModalNextDueDateDisplay(startDate);
+
+            const container = document.getElementById('ecm-platforms-list');
+            if (items.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400">Sin plataformas contratadas.</p>`;
+            } else {
+                container.innerHTML = items.map(item => `
+                    <div class="bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 p-2.5 rounded-xl space-y-2" data-plat-id="${item.platformId}" data-acc-id="${item.accountId}" data-prof-idx="${item.profileIdx}">
+                        <div class="flex justify-between items-center font-bold text-slate-800 dark:text-slate-200">
+                            <span>${item.platformName} (Perfil ${item.profileIdx + 1})</span>
+                            <span class="text-[10px] text-slate-400 font-normal">${item.accountEmail}</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold">Nombre Perfil</label>
+                                <input type="text" value="${item.profileName}" class="ecm-item-profname w-full px-2 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-xs text-slate-800 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold">PIN del Perfil</label>
+                                <input type="text" value="${item.pin}" class="ecm-item-pin w-full px-2 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono text-slate-800 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold">Precio Cobro (L.)</label>
+                                <input type="number" step="0.01" value="${item.price}" class="ecm-item-price w-full px-2 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold text-sky-700 dark:text-sky-400">
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('modal-edit-client-cobro').classList.remove('hidden');
+        };
+
+        window.updateCobroModalNextDueDateDisplay = function(startDateStr) {
+            const previewEl = document.getElementById('ecm-next-due-preview');
+            const nextDue = window.getNextDueDate(startDateStr);
+            if (nextDue) {
+                previewEl.innerText = nextDue.toLocaleDateString();
+            } else {
+                previewEl.innerText = '---';
+            }
+        };
+
+        window.saveClientFromCobroModal = function(e) {
+            e.preventDefault();
+            const origName = document.getElementById('ecm-original-name').value;
+            const newName = document.getElementById('ecm-name').value.trim();
+            const phone = document.getElementById('ecm-phone').value.trim();
+            const startDate = document.getElementById('ecm-start-date').value;
+
+            if (!newName) return;
+
+            const itemEls = document.querySelectorAll('#ecm-platforms-list > div');
+            itemEls.forEach(el => {
+                const platId = el.getAttribute('data-plat-id');
+                const accId = el.getAttribute('data-acc-id');
+                const profIdx = parseInt(el.getAttribute('data-prof-idx'), 10);
+
+                const profName = el.querySelector('.ecm-item-profname').value.trim();
+                const pin = el.querySelector('.ecm-item-pin').value.trim();
+                const price = parseFloat(el.querySelector('.ecm-item-price').value) || 0;
+
+                const platform = window.platforms.find(p => p.id === platId);
+                if (platform) {
+                    const account = platform.accounts.find(a => a.id === accId);
+                    if (account && account.profiles[profIdx]) {
+                        const prof = account.profiles[profIdx];
+                        prof.clientName = newName;
+                        prof.phone = phone;
+                        prof.startDate = startDate;
+                        prof.profileName = profName;
+                        prof.pin = pin;
+                        prof.monthlyPrice = price;
+                    }
+                }
+            });
+
+            if (origName !== newName) {
+                window.platforms.forEach(p => {
+                    if (p.accounts) {
+                        p.accounts.forEach(acc => {
+                            if (acc.profiles) {
+                                acc.profiles.forEach(prof => {
+                                    if (prof.clientName === origName) {
+                                        prof.clientName = newName;
+                                        prof.phone = phone;
+                                        prof.startDate = startDate;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+            window.saveData();
+            window.closeModal('modal-edit-client-cobro');
+            window.renderApp();
+        };
+
+        window.setCobrosFilter = function(filter) {
+            window.cobrosFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white', 'shadow');
+                btn.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+            });
+            const activeBtn = document.getElementById(`filter-${filter}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-slate-900', 'text-white', 'shadow');
+            }
+            window.renderModule2();
+        };
+
+        window.renderModule2 = function() {
+            const container = document.getElementById('clients-cobro-list');
+            const searchVal = (document.getElementById('search-client').value || '').toLowerCase();
+
+            let clientsMap = {};
+            let countDueSoon = 0;
+            let countExpired = 0;
+
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            acc.profiles.forEach((prof, pIdx) => {
+                                if (prof.clientName) {
+                                    if (!clientsMap[prof.clientName]) {
+                                        clientsMap[prof.clientName] = {
+                                            name: prof.clientName,
+                                            phone: prof.phone || '',
+                                            startDate: prof.startDate,
+                                            monthlyPrice: 0,
+                                            paid: prof.paid || false,
+                                            statusOverride: prof.statusOverride || null,
+                                            platforms: []
+                                        };
+                                    }
+
+                                    clientsMap[prof.clientName].monthlyPrice += (prof.monthlyPrice || p.profilePrice || 0);
+                                    clientsMap[prof.clientName].platforms.push({
+                                        platformName: p.name,
+                                        accountEmail: acc.email,
+                                        accountPass: acc.pass,
+                                        profileIdx: pIdx,
+                                        profileName: prof.profileName || '',
+                                        pin: prof.pin || ''
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            let clientList = Object.values(clientsMap);
+
+            clientList.forEach(c => {
+                let status = 'ok';
+                if (c.statusOverride) {
+                    status = c.statusOverride;
+                } else if (!c.paid) {
+                    status = 'expired';
+                } else {
+                    const nextDue = window.getNextDueDate(c.startDate);
+                    const daysLeft = window.calculateDaysDiff(nextDue);
+                    if (daysLeft <= 0) status = 'expired';
+                    else if (daysLeft <= 3) status = 'due_soon';
+                    else status = 'ok';
+                }
+
+                c.calculatedStatus = status;
+                if (status === 'due_soon') countDueSoon++;
+                if (status === 'expired') countExpired++;
+            });
+
+            document.getElementById('count-due-soon').innerText = countDueSoon;
+            document.getElementById('count-expired').innerText = countExpired;
+
+            let badgeCobros = document.getElementById('badge-cobros');
+            let mobBadgeCobros = document.getElementById('mob-badge-cobros');
+            let pendingTotal = countDueSoon + countExpired;
+
+            if (pendingTotal > 0) {
+                badgeCobros.innerText = pendingTotal;
+                badgeCobros.classList.remove('hidden');
+                mobBadgeCobros.innerText = pendingTotal;
+                mobBadgeCobros.classList.remove('hidden');
+            } else {
+                badgeCobros.classList.add('hidden');
+                mobBadgeCobros.classList.add('hidden');
+            }
+
+            if (searchVal) {
+                clientList = clientList.filter(c => c.name.toLowerCase().includes(searchVal));
+            }
+
+            if (window.cobrosFilter !== 'all') {
+                clientList = clientList.filter(c => c.calculatedStatus === window.cobrosFilter);
+            }
+
+            if (clientList.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-slate-400 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs">No se encontraron clientes con los criterios seleccionados.</div>`;
+                return;
+            }
+
+            container.innerHTML = clientList.map(c => {
+                const nextDue = window.getNextDueDate(c.startDate);
+                const nextDueDateStr = nextDue ? nextDue.toLocaleDateString() : 'N/A';
+                const daysLeft = window.calculateDaysDiff(nextDue);
+
+                let statusBadge = '';
+                let statusBg = '';
+
+                if (c.calculatedStatus === 'expired') {
+                    statusBadge = `<span class="bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300 px-2.5 py-1 rounded-full font-extrabold text-[10px]">VENCIDO / PENDIENTE</span>`;
+                    statusBg = 'border-l-4 border-l-rose-500';
+                } else if (c.calculatedStatus === 'due_soon') {
+                    statusBadge = `<span class="bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 px-2.5 py-1 rounded-full font-bold text-[10px]">POR VENCER (${daysLeft}d)</span>`;
+                    statusBg = 'border-l-4 border-l-amber-500';
+                } else {
+                    statusBadge = `<span class="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300 px-2.5 py-1 rounded-full font-bold text-[10px]">AL DÍA</span>`;
+                    statusBg = 'border-l-4 border-l-emerald-500';
+                }
+
+                return `
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3 ${statusBg}">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700 pb-2">
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-sm text-slate-900 dark:text-white">${c.name}</h3>
+                                ${statusBadge}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="window.openEditClientFromCobro('${c.name}')" title="Editar Cliente" class="px-2.5 py-1 bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 hover:bg-sky-200 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                                    <i class="fa-solid fa-pen"></i> Editar
+                                </button>
+                                <button onclick="window.cyclePaymentStatus('${c.name}')" title="Cambiar Estado" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Estado
+                                </button>
+                                ${c.calculatedStatus === 'expired' ? `
+                                    <button onclick="window.markAsPaid('${c.name}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
+                                        <i class="fa-solid fa-check"></i> Marcar Pagado
+                                    </button>
+                                ` : `
+                                    <button onclick="window.markAsUnpaid('${c.name}')" class="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
+                                        <i class="fa-solid fa-xmark"></i> Marcar Pendiente
+                                    </button>
+                                `}
+                                <button onclick="window.openReceiptModal('${c.name}')" title="Generar Recibo" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
+                                    <i class="fa-solid fa-receipt"></i> Recibo
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                            <div>
+                                <span class="text-slate-400 text-[10px] block">Monto Cobro Mensual:</span>
+                                <strong class="text-sky-600 dark:text-sky-400 font-extrabold text-sm">L. ${c.monthlyPrice.toFixed(2)}</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 text-[10px] block">Próxima Fecha Límite:</span>
+                                <strong class="text-slate-800 dark:text-slate-200 font-bold">${nextDueDateStr}</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 text-[10px] block">Contacto:</span>
+                                <span class="text-slate-700 dark:text-slate-300 font-medium">${c.phone || 'Sin WhatsApp'}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700/50 space-y-1">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Servicios Contratados:</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                ${c.platforms.map(p => `
+                                    <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
+                                        <div>
+                                            <strong class="text-slate-800 dark:text-slate-200 block">${p.platformName} ${p.profileName ? '(' + p.profileName + ')' : ''}</strong>
+                                            <span class="text-[10px] text-slate-400 font-mono">${p.accountEmail}</span>
+                                        </div>
+                                        ${p.pin ? `<span class="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-[10px] font-mono font-bold text-slate-700 dark:text-slate-300">PIN: ${p.pin}</span>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.sendPendingWhatsAppSummary = function() {
+            const targetPhone = document.getElementById('target-whatsapp').value.trim();
+            if (!targetPhone) {
+                alert('Ingrese el número de WhatsApp receptor (ejemplo: 50499999999)');
+                return;
+            }
+
+            let pendingList = [];
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            acc.profiles.forEach(prof => {
+                                if (prof.clientName) {
+                                    const nextDue = window.getNextDueDate(prof.startDate);
+                                    const daysLeft = window.calculateDaysDiff(nextDue);
+                                    if (daysLeft <= 3 || prof.statusOverride === 'expired' || prof.statusOverride === 'due_soon' || !prof.paid) {
+                                        pendingList.push({
+                                            name: prof.clientName,
+                                            platform: p.name,
+                                            price: prof.monthlyPrice || p.profilePrice || 0,
+                                            dueDate: nextDue ? nextDue.toLocaleDateString() : 'N/A'
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            if (pendingList.length === 0) {
+                alert('No hay clientes pendientes o por vencer en este momento.');
+                return;
+            }
+
+            let msg = `*RECORDATORIO DE COBROS PENDIENTES - JC STREAMING*\n\n`;
+            pendingList.forEach((item, idx) => {
+                msg += `${idx + 1}. *${item.name}* - ${item.platform} (L. ${item.price.toFixed(2)}) - Vence: ${item.dueDate}\n`;
+            });
+            msg += `\nPor favor realizar el pago correspondiente para mantener activo su servicio. ¡Gracias!`;
+
+            const url = `https://wa.me/${targetPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
+        };
+
+        window.openReceiptModal = function(clientName) {
+            let clientProfiles = [];
+            let totalAmount = 0;
+            let startDate = '';
+
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            acc.profiles.forEach((prof, pIdx) => {
+                                if (prof.clientName === clientName) {
+                                    const price = prof.monthlyPrice || p.profilePrice || 0;
+                                    totalAmount += price;
+                                    if (!startDate) startDate = prof.startDate;
+
+                                    clientProfiles.push({
+                                        platformName: p.name,
+                                        profileName: prof.profileName || `Perfil ${pIdx + 1}`,
+                                        price: price
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            document.getElementById('rec-id').innerText = 'REC-' + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('rec-client-name').innerText = clientName;
+            document.getElementById('rec-date').innerText = new Date().toLocaleDateString();
+
+            const nextDue = window.getNextDueDate(startDate);
+            document.getElementById('rec-next-date').innerText = nextDue ? nextDue.toLocaleDateString() : 'N/A';
+            document.getElementById('rec-amount').innerText = `L. ${totalAmount.toFixed(2)}`;
+
+            const listContainer = document.getElementById('rec-profiles-list');
+            listContainer.innerHTML = clientProfiles.map(p => `
+                <div class="flex justify-between items-center text-[11px]">
+                    <span>${p.platformName} - ${p.profileName}</span>
+                    <span class="font-bold">L. ${p.price.toFixed(2)}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('modal-receipt').classList.remove('hidden');
+        };
+
+        window.renderModule3 = function() {
+            let totalIncome = 0;
+            let totalExpenses = 0;
+            let providerList = [];
+
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        const accCost = p.accountCost || 0;
+                        totalExpenses += accCost;
+
+                        let accIncome = 0;
+                        if (acc.profiles) {
+                            acc.profiles.forEach(prof => {
+                                if (prof.clientName) {
+                                    const profPrice = prof.monthlyPrice || p.profilePrice || 0;
+                                    accIncome += profPrice;
+                                    totalIncome += profPrice;
+                                }
+                            });
+                        }
+
+                        providerList.push({
+                            platformName: p.name,
+                            accountEmail: acc.email,
+                            cost: accCost,
+                            income: accIncome,
+                            dueDate: acc.dueDate || ''
+                        });
+                    });
+                }
+            });
+
+            const profit = totalIncome - totalExpenses;
+
+            document.getElementById('fin-income').innerText = `L. ${totalIncome.toFixed(2)}`;
+            document.getElementById('fin-expenses').innerText = `L. ${totalExpenses.toFixed(2)}`;
+            document.getElementById('fin-profit').innerText = `L. ${profit.toFixed(2)}`;
+
+            const container = document.getElementById('provider-payments-list');
+            if (providerList.length === 0) {
+                container.innerHTML = `<p class="p-4 text-xs text-slate-400 text-center">No hay cuentas de proveedores registradas.</p>`;
+                return;
+            }
+
+            container.innerHTML = providerList.map(item => {
+                const dueDateObj = item.dueDate ? new Date(item.dueDate + 'T00:00:00') : null;
+                const daysLeft = window.calculateDaysDiff(dueDateObj);
+
+                let statusBadge = '';
+                if (!dueDateObj) {
+                    statusBadge = `<span class="text-slate-400 font-bold">Sin fecha</span>`;
+                } else if (daysLeft <= 0) {
+                    statusBadge = `<span class="bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300 px-2 py-0.5 rounded font-extrabold text-[10px]">PAGAR HOY</span>`;
+                } else if (daysLeft <= 3) {
+                    statusBadge = `<span class="bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 px-2 py-0.5 rounded font-bold text-[10px]">Vence en ${daysLeft}d</span>`;
+                } else {
+                    statusBadge = `<span class="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300 px-2 py-0.5 rounded font-bold text-[10px]">Al día (${daysLeft}d)</span>`;
+                }
+
+                return `
+                    <div class="p-3 flex items-center justify-between text-xs hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200 block font-bold">${item.platformName}</strong>
+                            <span class="text-[10px] text-slate-400 font-mono">${item.accountEmail}</span>
+                        </div>
+                        <div class="text-right space-y-0.5">
+                            <span class="font-extrabold text-rose-600 dark:text-rose-400 block">Costo: L. ${item.cost.toFixed(2)}</span>
+                            <div>${statusBadge}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.renderModule4 = function() {
+            let soldProfiles = 0;
+            let totalCollected = 0;
+            let totalExpected = 0;
+            let totalProviders = 0;
+
+            let accountsCostList = [];
+            let emptyAccountsList = [];
+            let unpaidClientsMap = {};
+
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        const accCost = p.accountCost || 0;
+                        totalProviders += accCost;
+
+                        let totalProfilesCount = p.maxProfiles || 5;
+                        let occupiedCount = 0;
+
+                        if (acc.profiles) {
+                            acc.profiles.forEach((prof, pIdx) => {
+                                if (prof.clientName) {
+                                    soldProfiles++;
+                                    const profPrice = prof.monthlyPrice || p.profilePrice || 0;
+                                    totalExpected += profPrice;
+
+                                    if (prof.paid) {
+                                        totalCollected += profPrice;
+                                    } else {
+                                        if (!unpaidClientsMap[prof.clientName]) {
+                                            unpaidClientsMap[prof.clientName] = {
+                                                name: prof.clientName,
+                                                phone: prof.phone || '',
+                                                amount: 0,
+                                                services: []
+                                            };
+                                        }
+                                        unpaidClientsMap[prof.clientName].amount += profPrice;
+                                        unpaidClientsMap[prof.clientName].services.push(`${p.name} (Perfil ${pIdx + 1})`);
+                                    }
+
+                                    occupiedCount++;
+                                }
+                            });
+                        }
+
+                        accountsCostList.push({
+                            platformName: p.name,
+                            accountEmail: acc.email,
+                            cost: accCost
+                        });
+
+                        const freeSlots = totalProfilesCount - occupiedCount;
+                        if (freeSlots > 0) {
+                            emptyAccountsList.push({
+                                platformName: p.name,
+                                accountEmail: acc.email,
+                                freeSlots: freeSlots,
+                                totalSlots: totalProfilesCount
+                            });
+                        }
+                    });
+                }
+            });
+
+            const realBalance = totalCollected - totalProviders;
+
+            document.getElementById('rep-sold-profiles').innerText = soldProfiles;
+            document.getElementById('rep-total-expected').innerText = `L. ${totalExpected.toFixed(2)}`;
+            document.getElementById('rep-total-collected').innerText = `L. ${totalCollected.toFixed(2)}`;
+            document.getElementById('rep-total-providers').innerText = `L. ${totalProviders.toFixed(2)}`;
+
+            const balanceCard = document.getElementById('rep-balance-card');
+            const balanceTitle = document.getElementById('rep-balance-title');
+            const balanceAmount = document.getElementById('rep-balance-amount');
+
+            balanceTitle.innerText = "Ganancia Real";
+            balanceAmount.innerText = `L. ${realBalance.toFixed(2)}`;
+
+            if (realBalance >= 0) {
+                balanceCard.className = "bg-emerald-50 dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 p-4 rounded-2xl text-center";
+                balanceTitle.className = "block text-xs font-bold text-emerald-700 dark:text-emerald-400";
+                balanceAmount.className = "text-2xl font-black text-emerald-900 dark:text-emerald-200";
+            } else {
+                balanceCard.className = "bg-rose-50 dark:bg-slate-800 border border-rose-100 dark:border-slate-700 p-4 rounded-2xl text-center";
+                balanceTitle.className = "block text-xs font-bold text-rose-700 dark:text-rose-400";
+                balanceAmount.className = "text-2xl font-black text-rose-900 dark:text-rose-200";
+            }
+
+            const accCostContainer = document.getElementById('rep-accounts-cost-list');
+            if (accountsCostList.length === 0) {
+                accCostContainer.innerHTML = `<p class="p-3 text-slate-400 italic">No hay cuentas registradas.</p>`;
+            } else {
+                accCostContainer.innerHTML = accountsCostList.map(item => `
+                    <div class="py-2 flex justify-between items-center">
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200 font-bold block">${item.platformName}</strong>
+                            <span class="text-[10px] text-slate-400 font-mono">${item.accountEmail}</span>
+                        </div>
+                        <span class="font-extrabold text-rose-600 dark:text-rose-400">L. ${item.cost.toFixed(2)}</span>
+                    </div>
+                `).join('');
+            }
+
+            const emptyAccContainer = document.getElementById('rep-empty-accounts-list');
+            if (emptyAccountsList.length === 0) {
+                emptyAccContainer.innerHTML = `<p class="p-3 text-slate-400 italic">Todas las cuentas están totalmente llenas.</p>`;
+            } else {
+                emptyAccContainer.innerHTML = emptyAccountsList.map(item => `
+                    <div class="py-2 flex justify-between items-center">
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200 font-bold block">${item.platformName}</strong>
+                            <span class="text-[10px] text-slate-400 font-mono">${item.accountEmail}</span>
+                        </div>
+                        <span class="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 font-bold px-2 py-0.5 rounded text-[10px]">
+                            ${item.freeSlots} de ${item.totalSlots} espacio(s) libre(s)
+                        </span>
+                    </div>
+                `).join('');
+            }
+
+            const unpaidList = Object.values(unpaidClientsMap);
+            document.getElementById('rep-unpaid-count').innerText = `${unpaidList.length} morosos`;
+
+            const unpaidContainer = document.getElementById('rep-unpaid-clients-list');
+            if (unpaidList.length === 0) {
+                unpaidContainer.innerHTML = `<p class="p-3 text-emerald-600 dark:text-emerald-400 font-bold italic">¡Excelente! Todos los clientes han realizado su pago este mes.</p>`;
+            } else {
+                unpaidContainer.innerHTML = unpaidList.map(c => `
+                    <div class="bg-rose-50/50 dark:bg-slate-900/40 border border-rose-200 dark:border-rose-900/50 p-3 rounded-xl flex items-center justify-between">
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200 font-bold block">${c.name}</strong>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 block">${c.services.join(', ')}</span>
+                            <span class="text-[10px] text-rose-600 dark:text-rose-400 font-bold">Debe: L. ${c.amount.toFixed(2)}</span>
+                        </div>
+                        <button onclick="window.removeAccessFromUnpaid('${c.name}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center gap-1">
+                            <i class="fa-solid fa-user-minus"></i> Quitar Acceso
+                        </button>
+                    </div>
+                `).join('');
+            }
+        };
+
+        window.removeAccessFromUnpaid = function(clientName) {
+            if (!confirm(`¿Deseas quitar el acceso y liberar todos los perfiles de ${clientName}?`)) return;
+
+            window.platforms.forEach(p => {
+                if (p.accounts) {
+                    p.accounts.forEach(acc => {
+                        if (acc.profiles) {
+                            acc.profiles.forEach(prof => {
+                                if (prof.clientName === clientName) {
+                                    prof.clientName = '';
+                                    prof.profileName = '';
+                                    prof.phone = '';
+                                    prof.pin = '';
+                                    prof.startDate = '';
+                                    prof.paid = false;
+                                    delete prof.statusOverride;
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            window.saveData();
+            window.renderApp();
+            alert(`Acceso revocado y perfiles liberados para ${clientName}`);
+        };
+
+        window.openModalAddPlatform = function() {
+            document.getElementById('modal-add-platform').classList.remove('hidden');
+        };
+
+        window.saveNewPlatform = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('np-name').value.trim();
+            const icon = document.getElementById('np-icon').value.trim() || 'fa-tv';
+            const profilePrice = parseFloat(document.getElementById('np-profile-price').value) || 0;
+            const accountCost = parseFloat(document.getElementById('np-account-cost').value) || 0;
+
+            if (!name) return;
+
+            const colors = ['bg-red-600', 'bg-blue-600', 'bg-purple-700', 'bg-emerald-500', 'bg-amber-600', 'bg-indigo-600', 'bg-pink-600'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+            const newPlatform = {
+                id: 'p_' + Date.now(),
+                name,
+                icon,
+                color: randomColor,
+                profilePrice,
+                accountCost,
+                maxProfiles: 5,
+                accounts: []
+            };
+
+            window.platforms.push(newPlatform);
+            window.saveData();
+            window.closeModal('modal-add-platform');
+            window.renderApp();
+
+            document.getElementById('np-name').value = '';
+        };
+
+        window.exportBackup = function() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+                users: window.users,
+                platforms: window.platforms,
+                lastResetMonth: window.lastResetMonth
+            }));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `jc_streaming_backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        };
+
+        window.renderApp();
+    </script>
+</body>
+</html>
